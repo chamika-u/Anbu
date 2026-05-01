@@ -218,7 +218,7 @@ This is a {language} project. Explore the repository to understand:
             # WatsonX successfully generated documentation
             documentation = response.get('content', '')
             ai_generated = True
-            print(f"[Analyze] ✓ Successfully generated AI documentation ({len(documentation)} chars)")
+            print(f"[Analyze] [OK] Successfully generated AI documentation ({len(documentation)} chars)")
         
         # Prepare metadata (repo_info is guaranteed to be a dict here)
         metadata = {

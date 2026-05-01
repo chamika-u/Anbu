@@ -41,16 +41,16 @@ class WatsonXService:
         self.is_configured = False
         
         if not WATSONX_AVAILABLE:
-            print("[WatsonX Init] ✗ WatsonX SDK not installed. Install with: pip install ibm-watsonx-ai")
+            print("[WatsonX Init] [X] WatsonX SDK not installed. Install with: pip install ibm-watsonx-ai")
             return
             
         if not self.api_key or not self.project_id:
-            print("[WatsonX Init] ✗ Missing credentials. Please set IBM_WATSONX_API_KEY and IBM_WATSONX_PROJECT_ID in .env")
+            print("[WatsonX Init] [X] Missing credentials. Please set IBM_WATSONX_API_KEY and IBM_WATSONX_PROJECT_ID in .env")
             return
             
         # Check if credentials are not placeholder values
         if self.api_key == 'your-watsonx-api-key-here' or self.project_id == 'your-watsonx-project-id-here':
-            print("[WatsonX Init] ✗ Placeholder credentials detected. Please update backend/.env with actual credentials.")
+            print("[WatsonX Init] [X] Placeholder credentials detected. Please update backend/.env with actual credentials.")
             return
         
         try:
@@ -63,9 +63,9 @@ class WatsonXService:
             self.client = APIClient(credentials)  # type: ignore
             self.client.set.default_project(self.project_id)
             self.is_configured = True
-            print("[WatsonX Init] ✓ WatsonX client initialized successfully!")
+            print("[WatsonX Init] [OK] WatsonX client initialized successfully!")
         except Exception as e:
-            print(f"[WatsonX Init] ✗ Could not initialize WatsonX client: {e}")
+            print(f"[WatsonX Init] [X] Could not initialize WatsonX client: {e}")
             self.client = None
             self.is_configured = False
     
@@ -114,7 +114,7 @@ class WatsonXService:
             print("[WatsonX] Sending request to model...")
             response = model.generate_text(prompt=prompt)
             
-            print(f"[WatsonX] ✓ Generated {len(response)} characters of documentation")
+            print(f"[WatsonX] [OK] Generated {len(response)} characters of documentation")
             
             return {
                 'success': True,
@@ -124,7 +124,7 @@ class WatsonXService:
             
         except Exception as e:
             error_msg = f"Error generating documentation: {str(e)}"
-            print(f"[WatsonX] ✗ {error_msg}")
+            print(f"[WatsonX] [X] {error_msg}")
             return {
                 'success': False,
                 'error': error_msg,
@@ -183,7 +183,7 @@ class WatsonXService:
             
         except Exception as e:
             error_msg = f"Error generating response: {str(e)}"
-            print(f"[WatsonX Chat] ✗ {error_msg}")
+            print(f"[WatsonX Chat] [X] {error_msg}")
             return {
                 'error': error_msg,
                 'conversation_id': conversation_id or 'error',
