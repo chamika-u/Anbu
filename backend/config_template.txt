@@ -8,8 +8,17 @@ PORT=5000
 # Database
 DATABASE_URL=sqlite:///anbu.db
 
-# Anthropic API
-ANTHROPIC_API_KEY=your-anthropic-api-key-here
+# IBM WatsonX AI Configuration
+IBM_WATSONX_API_KEY=your-watsonx-api-key-here
+IBM_WATSONX_PROJECT_ID=your-watsonx-project-id-here
+IBM_WATSONX_URL=https://us-south.ml.cloud.ibm.com
+IBM_WATSONX_MODEL_ID=ibm/granite-13b-chat-v2
+
+# IBM Watson Assistant Configuration (Optional)
+IBM_WATSON_API_KEY=your-watson-api-key-here
+IBM_WATSON_ASSISTANT_ID=your-watson-assistant-id-here
+IBM_WATSON_URL=your-watson-url-here
+IBM_WATSON_VERSION=2021-11-27
 
 # Upload Configuration
 UPLOAD_FOLDER=uploads

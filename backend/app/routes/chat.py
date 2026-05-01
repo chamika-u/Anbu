@@ -1,21 +1,43 @@
 from flask import Blueprint, request, jsonify
-from app.services.claude_service import ClaudeService
+from app.services.watsonx_service import WatsonXService, WatsonAssistantService
 
 bp = Blueprint('chat', __name__, url_prefix='/api')
-claude_service = ClaudeService()
+watsonx_service = WatsonXService()
+watson_assistant_service = WatsonAssistantService()
 
 @bp.route('/chat', methods=['POST'])
 def chat():
-    """Handle chat requests"""
+    """Handle chat requests using WatsonX"""
     try:
         data = request.get_json()
         message = data.get('message')
         conversation_id = data.get('conversation_id')
+        model_id = data.get('model_id')
         
         if not message:
             return jsonify({'error': 'Message is required'}), 400
         
-        response = claude_service.send_message(message, conversation_id)
+        response = watsonx_service.send_message(message, conversation_id, model_id)
+        
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/chat/assistant', methods=['POST'])
+def chat_assistant():
+    """Handle chat requests using Watson Assistant"""
+    try:
+        data = request.get_json()
+        message = data.get('message')
+        session_id = data.get('session_id')
+        
+        if not message:
+            return jsonify({'error': 'Message is required'}), 400
+        
+        if not session_id:
+            session_id = watson_assistant_service.create_session()
+        
+        response = watson_assistant_service.send_message(session_id, message)
         
         return jsonify(response), 200
     except Exception as e:
@@ -25,7 +47,7 @@ def chat():
 def get_conversations():
     """Get all conversations"""
     try:
-        conversations = claude_service.get_conversations()
+        conversations = watsonx_service.get_conversations()
         return jsonify(conversations), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -34,8 +56,26 @@ def get_conversations():
 def delete_conversation(conversation_id):
     """Delete a conversation"""
     try:
-        claude_service.delete_conversation(conversation_id)
+        watsonx_service.delete_conversation(conversation_id)
         return jsonify({'message': 'Conversation deleted'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/sessions', methods=['POST'])
+def create_session():
+    """Create a new Watson Assistant session"""
+    try:
+        session_id = watson_assistant_service.create_session()
+        return jsonify({'session_id': session_id}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/sessions/<session_id>', methods=['DELETE'])
+def delete_session(session_id):
+    """Delete a Watson Assistant session"""
+    try:
+        watson_assistant_service.delete_session(session_id)
+        return jsonify({'message': 'Session deleted'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
