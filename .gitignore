@@ -1,0 +1,143 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Flask
+instance/
+.webassets-cache
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log.*
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary Files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS Files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# IBM Cloud
+.bluemix/
+.cfignore
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
+
+# Backup Files
+*.bak
+*.backup
+*~
+
+# Generated Documentation (for testing)
+generated_docs/
+test_outputs/
+
+# Secrets and Keys
+*.pem
+*.key
+*.cert
+secrets/
+credentials/
+
+# Large Files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Media Files (if not needed)
+*.mp4
+*.avi
+*.mov
+*.wmv
+
+# Package Files
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Made with Bob

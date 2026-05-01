@@ -1,0 +1,121 @@
+# Anbu - Bob AI Ignore File
+# Files and directories that Bob should not analyze or modify
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+secrets/
+credentials/
+*.pem
+*.key
+*.cert
+
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build Outputs
+dist/
+build/
+*.egg-info/
+frontend/dist/
+frontend/build/
+.vite/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Testing & Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+test_outputs/
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary Files
+*.tmp
+*.temp
+temp/
+tmp/
+*.bak
+*.backup
+
+# Generated Documentation (test files)
+generated_docs/
+test_docs/
+
+# Large Binary Files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Package Lock Files (too large)
+package-lock.json
+yarn.lock
+poetry.lock
+Pipfile.lock
+
+# Git Files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Cloud Config
+.bluemix/
+.cfignore
+
+# Documentation that shouldn't be modified
+LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
+# Made with Bob
