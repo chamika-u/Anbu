@@ -36,6 +36,8 @@ def chat_assistant():
         
         if not session_id:
             session_id = watson_assistant_service.create_session()
+            if not session_id:
+                return jsonify({'error': 'Failed to create session'}), 500
         
         response = watson_assistant_service.send_message(session_id, message)
         
