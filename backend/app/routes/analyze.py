@@ -147,6 +147,10 @@ def analyze_repository():
         # Check if WatsonX is available and successful
         if not response.get('success', False):
             # Provide a fallback documentation template when WatsonX is not configured
+            error_msg = response.get('error', 'WatsonX AI not available')
+            print(f"[Analyze] WatsonX not available: {error_msg}")
+            
+            # repo_info is guaranteed to be a dict here (we checked for error earlier)
             description = repo_info.get('description', 'No description provided') if repo_info else 'No description provided'
             language = repo_info.get('language', 'Unknown') if repo_info else 'Unknown'
             languages = repo_info.get('languages', []) if repo_info else []
@@ -205,24 +209,25 @@ This is a {language} project. Explore the repository to understand:
 
 ---
 
-**Note:** This is a basic template. For AI-generated comprehensive documentation, please configure IBM watsonx AI credentials in the backend `.env` file.
+**Note:** This is a basic template. For AI-generated comprehensive documentation, please configure IBM WatsonX AI credentials in the backend `.env` file.
+
+**Error:** {error_msg}
 """
-        elif 'error' in response:
-            return jsonify({
-                'success': False,
-                'error': response['error']
-            }), 500
+            ai_generated = False
         else:
-            documentation = response.get('message', '')
+            # WatsonX successfully generated documentation
+            documentation = response.get('content', '')
+            ai_generated = True
+            print(f"[Analyze] ✓ Successfully generated AI documentation ({len(documentation)} chars)")
         
-        # Prepare metadata (repo_info is guaranteed to be a dict here, not None)
+        # Prepare metadata (repo_info is guaranteed to be a dict here)
         metadata = {
             'repo_name': repo,
             'owner': owner,
-            'tech_stack': repo_info['languages'] if repo_info else [],
+            'tech_stack': repo_info.get('languages', []) if repo_info else [],
             'dependencies_count': len(repo_info.get('contents', [])) if repo_info else 0,
             'generated_at': datetime.utcnow().isoformat(),
-            'ai_generated': 'error' not in response or 'not initialized' not in response.get('error', '')
+            'ai_generated': ai_generated
         }
         
         return jsonify({

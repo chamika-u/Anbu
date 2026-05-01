@@ -1,17 +1,24 @@
 import os
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
+# Type checking imports
+if TYPE_CHECKING:
+    from ibm_watsonx_ai import APIClient, Credentials
+    from ibm_watsonx_ai.foundation_models import ModelInference
+    from ibm_watsonx_ai.metanames import GenTextParamsMetaNames
+
+# Runtime imports with fallback
 try:
     from ibm_watsonx_ai import APIClient, Credentials
     from ibm_watsonx_ai.foundation_models import ModelInference
     from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
     WATSONX_AVAILABLE = True
 except ImportError:
-    APIClient = None
-    Credentials = None
-    ModelInference = None
-    GenParams = None
+    APIClient = None  # type: ignore
+    Credentials = None  # type: ignore
+    ModelInference = None  # type: ignore
+    GenParams = None  # type: ignore
     WATSONX_AVAILABLE = False
 
 
@@ -30,7 +37,7 @@ class WatsonXService:
         print(f"[WatsonX Init] WatsonX SDK available: {WATSONX_AVAILABLE}")
         
         # Initialize WatsonX client only if credentials are available
-        self.client = None
+        self.client: Optional[Any] = None
         self.is_configured = False
         
         if not WATSONX_AVAILABLE:
@@ -48,11 +55,12 @@ class WatsonXService:
         
         try:
             print("[WatsonX Init] Attempting to initialize WatsonX client...")
-            credentials = Credentials(
+            # Type ignore for when SDK is not installed
+            credentials = Credentials(  # type: ignore
                 url=self.url,
                 api_key=self.api_key
             )
-            self.client = APIClient(credentials)
+            self.client = APIClient(credentials)  # type: ignore
             self.client.set.default_project(self.project_id)
             self.is_configured = True
             print("[WatsonX Init] ✓ WatsonX client initialized successfully!")
@@ -86,18 +94,19 @@ class WatsonXService:
             print(f"[WatsonX] Generating documentation with model: {model_id}")
             
             # Initialize model with proper parameters
-            model = ModelInference(
+            # Type ignore for when SDK is not installed
+            model = ModelInference(  # type: ignore
                 model_id=model_id,
                 api_client=self.client,
                 project_id=self.project_id,
                 params={
-                    GenParams.DECODING_METHOD: "greedy",
-                    GenParams.MAX_NEW_TOKENS: 2048,
-                    GenParams.MIN_NEW_TOKENS: 100,
-                    GenParams.TEMPERATURE: 0.7,
-                    GenParams.TOP_K: 50,
-                    GenParams.TOP_P: 1,
-                    GenParams.REPETITION_PENALTY: 1.1
+                    "decoding_method": "greedy",
+                    "max_new_tokens": 2048,
+                    "min_new_tokens": 100,
+                    "temperature": 0.7,
+                    "top_k": 50,
+                    "top_p": 1,
+                    "repetition_penalty": 1.1
                 }
             )
             
@@ -149,16 +158,17 @@ class WatsonXService:
             print(f"[WatsonX Chat] Sending message with model: {model_id}")
             
             # Initialize model
-            model = ModelInference(
+            # Type ignore for when SDK is not installed
+            model = ModelInference(  # type: ignore
                 model_id=model_id,
                 api_client=self.client,
                 project_id=self.project_id,
                 params={
-                    GenParams.DECODING_METHOD: "greedy",
-                    GenParams.MAX_NEW_TOKENS: 1024,
-                    GenParams.TEMPERATURE: 0.7,
-                    GenParams.TOP_K: 50,
-                    GenParams.TOP_P: 1
+                    "decoding_method": "greedy",
+                    "max_new_tokens": 1024,
+                    "temperature": 0.7,
+                    "top_k": 50,
+                    "top_p": 1
                 }
             )
             
@@ -191,7 +201,7 @@ class WatsonXService:
 
 
 # Singleton instance
-_watsonx_service = None
+_watsonx_service: Optional[WatsonXService] = None
 
 def get_watsonx_service() -> WatsonXService:
     """Get or create the WatsonX service singleton"""
