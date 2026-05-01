@@ -1,0 +1,19 @@
+# Working Requirements - Updated IBM Watson Packages
+# These versions are compatible with Python 3.11+
+
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.1.1
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Updated IBM Watson packages (newer versions without pkg_resources issue)
+ibm-watson>=8.1.0
+ibm-cloud-sdk-core>=3.20.0
+ibm-watsonx-ai>=1.0.0
+
+# Testing and Development
+pytest==7.4.3
+pytest-cov==4.1.0
+black==23.12.1
+flake8==7.0.0
