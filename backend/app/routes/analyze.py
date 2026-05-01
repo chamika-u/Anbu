@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.watsonx_service import WatsonXService
+from app.services.watsonx_service import get_watsonx_service
 import requests
 import re
 from datetime import datetime
@@ -9,7 +9,6 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 bp = Blueprint('analyze', __name__, url_prefix='/api')
-watsonx_service = WatsonXService()
 
 def extract_repo_info(repo_url):
     """Extract owner and repo name from GitHub URL"""
@@ -116,6 +115,9 @@ Make it beginner-friendly, clear, and actionable. Use examples where helpful."""
 def analyze_repository():
     """Analyze a GitHub repository and generate onboarding documentation"""
     try:
+        # Get WatsonX service instance
+        watsonx_service = get_watsonx_service()
+        
         data = request.get_json()
         repo_url = data.get('repo_url')
         
@@ -136,10 +138,14 @@ def analyze_repository():
         prompt = generate_documentation_prompt(repo_info, owner, repo)
         
         # Use WatsonX to generate documentation
-        response = watsonx_service.send_message(prompt)
+        print(f"[Analyze] Attempting to generate documentation with WatsonX...")
+        response = watsonx_service.generate_documentation(prompt)
         
-        # Check if WatsonX is available
-        if 'error' in response and 'not initialized' in response.get('error', ''):
+        # Debug: Print the response to see what's happening
+        print(f"[Analyze] WatsonX Response: {response}")
+        
+        # Check if WatsonX is available and successful
+        if not response.get('success', False):
             # Provide a fallback documentation template when WatsonX is not configured
             description = repo_info.get('description', 'No description provided') if repo_info else 'No description provided'
             language = repo_info.get('language', 'Unknown') if repo_info else 'Unknown'
