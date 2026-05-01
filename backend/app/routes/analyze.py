@@ -138,13 +138,76 @@ def analyze_repository():
         # Use WatsonX to generate documentation
         response = watsonx_service.send_message(prompt)
         
-        if 'error' in response:
+        # Check if WatsonX is available
+        if 'error' in response and 'not initialized' in response.get('error', ''):
+            # Provide a fallback documentation template when WatsonX is not configured
+            description = repo_info.get('description', 'No description provided') if repo_info else 'No description provided'
+            language = repo_info.get('language', 'Unknown') if repo_info else 'Unknown'
+            languages = repo_info.get('languages', []) if repo_info else []
+            tech_stack = ', '.join(languages) if languages else language
+            
+            documentation = f"""# {repo} - Developer Onboarding Guide
+
+## Project Overview
+
+**Repository:** {owner}/{repo}
+**Description:** {description}
+**Primary Language:** {language}
+**Tech Stack:** {tech_stack}
+
+## Getting Started
+
+### Prerequisites
+- Git installed on your machine
+- {language} development environment set up
+- Basic knowledge of {language} programming
+
+### Installation Steps
+
+1. Clone the repository:
+```bash
+git clone https://github.com/{owner}/{repo}.git
+cd {repo}
+```
+
+2. Install dependencies (check the repository for specific instructions)
+
+3. Configure environment variables if needed
+
+4. Run the application
+
+## Project Structure
+
+This is a {language} project. Explore the repository to understand:
+- Main application files
+- Configuration files
+- Documentation
+- Tests (if available)
+
+## Development Workflow
+
+1. Create a new branch for your feature
+2. Make your changes
+3. Test your changes thoroughly
+4. Submit a pull request
+
+## Resources
+
+- [Repository on GitHub](https://github.com/{owner}/{repo})
+- [GitHub Documentation](https://docs.github.com)
+- [{language} Documentation](https://www.google.com/search?q={language}+documentation)
+
+---
+
+**Note:** This is a basic template. For AI-generated comprehensive documentation, please configure IBM watsonx AI credentials in the backend `.env` file.
+"""
+        elif 'error' in response:
             return jsonify({
                 'success': False,
                 'error': response['error']
             }), 500
-        
-        documentation = response.get('message', '')
+        else:
+            documentation = response.get('message', '')
         
         # Prepare metadata (repo_info is guaranteed to be a dict here, not None)
         metadata = {
@@ -152,14 +215,16 @@ def analyze_repository():
             'owner': owner,
             'tech_stack': repo_info['languages'] if repo_info else [],
             'dependencies_count': len(repo_info.get('contents', [])) if repo_info else 0,
-            'generated_at': datetime.utcnow().isoformat()
+            'generated_at': datetime.utcnow().isoformat(),
+            'ai_generated': 'error' not in response or 'not initialized' not in response.get('error', '')
         }
         
         return jsonify({
             'success': True,
             'documentation': documentation,
             'metadata': metadata,
-            'share_url': f'https://github.com/{owner}/{repo}'
+            'share_url': f'https://github.com/{owner}/{repo}',
+            'using_watsonx': metadata['ai_generated']
         }), 200
         
     except Exception as e:

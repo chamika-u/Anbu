@@ -23,8 +23,10 @@ export interface AnalyzeResponse {
     tech_stack: string[];
     dependencies_count: number;
     generated_at: string;
+    ai_generated?: boolean;
   };
   share_url?: string;
+  using_watsonx?: boolean;
   error?: string;
 }
 
