@@ -88,7 +88,7 @@ class WatsonXService:
             }
         
         if model_id is None:
-            model_id = os.getenv('IBM_WATSONX_MODEL_ID', 'ibm/granite-13b-chat-v2')
+            model_id = os.getenv('IBM_WATSONX_MODEL_ID', 'meta-llama/llama-3-3-70b-instruct')
         
         try:
             print(f"[WatsonX] Generating documentation with model: {model_id}")
@@ -152,7 +152,7 @@ class WatsonXService:
             }
         
         if model_id is None:
-            model_id = os.getenv('IBM_WATSONX_MODEL_ID', 'ibm/granite-13b-chat-v2')
+            model_id = os.getenv('IBM_WATSONX_MODEL_ID', 'meta-llama/llama-3-3-70b-instruct')
         
         try:
             print(f"[WatsonX Chat] Sending message with model: {model_id}")
