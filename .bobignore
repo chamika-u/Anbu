@@ -2,14 +2,6 @@
 # Files and directories that Bob should not analyze or modify
 
 # Environment Variables & Secrets
-.env
-.env.*
-*.env
-secrets/
-credentials/
-*.pem
-*.key
-*.cert
 
 # Dependencies
 node_modules/
