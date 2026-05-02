@@ -216,65 +216,7 @@ def generate_deterministic_mermaid(repo_name: str, tree: list) -> str:
     return "\n".join(lines)
 
 
-def build_fallback_documentation(owner: str, repo: str, repo_info: dict) -> str:
-    """Return a plain template when WatsonX AI is unavailable."""
-    language  = repo_info.get('language', 'Unknown')
-    languages = repo_info.get('languages', [])
-    tech_stack = ', '.join(languages) if languages else language
-    description = repo_info.get('description') or 'No description provided'
-    
-    mermaid_code = generate_deterministic_mermaid(repo, repo_info.get('tree', []))
-
-    return f"""# {repo} — Developer Onboarding Guide
-
-> **Note:** This is an auto-generated template. Configure IBM watsonx AI credentials for a fully AI-generated guide.
-
-## Project Overview
-
-| Field | Value |
-|---|---|
-| Repository | `{owner}/{repo}` |
-| Description | {description} |
-| Primary Language | {language} |
-| Tech Stack | {tech_stack} |
-
-## Repository Architecture
-
-This is the live directory structure fetched directly from GitHub:
-
-```mermaid
-{mermaid_code}
-```
-
-## Getting Started
-
-### Prerequisites
-- Git installed on your machine
-- {language} development environment
-- Basic familiarity with {language}
-
-### Installation
-
-```bash
-git clone https://github.com/{owner}/{repo}.git
-cd {repo}
-```
-
-Then install dependencies and configure environment variables as described in the repository's own README.
-
-## Development Workflow
-
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes and write tests
-3. Commit with a clear message: `git commit -m "feat: add my feature"`
-4. Open a pull request for review
-
-## Resources
-
-- [Repository on GitHub](https://github.com/{owner}/{repo})
-- [GitHub Docs](https://docs.github.com)
-- [{language} Documentation](https://www.google.com/search?q={language}+documentation)
-"""
+# Fallback documentation is now handled by DefaultAIService
 
 
 def generate_deterministic_checklist(repo_info: dict) -> list:
