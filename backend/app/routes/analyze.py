@@ -5,243 +5,278 @@ import re
 from datetime import datetime
 import urllib3
 
-# Disable SSL warnings
+# Suppress noisy SSL warnings for GitHub API calls
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 bp = Blueprint('analyze', __name__, url_prefix='/api')
 
-def extract_repo_info(repo_url):
-    """Extract owner and repo name from GitHub URL"""
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def extract_repo_info(repo_url: str):
+    """Return (owner, repo) from a GitHub URL, or (None, None) if unrecognised."""
     pattern = r'github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$'
     match = re.search(pattern, repo_url)
     if match:
         return match.group(1), match.group(2)
     return None, None
 
-def fetch_github_repo_data(owner, repo):
-    """Fetch repository data from GitHub API"""
-    try:
-        # Disable SSL verification to avoid certificate issues
-        # Get repository info
-        repo_response = requests.get(f'https://api.github.com/repos/{owner}/{repo}', verify=False)
-        if repo_response.status_code != 200:
-            return None, f"Repository not found or not accessible"
-        
-        repo_data = repo_response.json()
-        
-        # Get repository contents
-        contents_response = requests.get(f'https://api.github.com/repos/{owner}/{repo}/contents', verify=False)
-        contents_data = contents_response.json() if contents_response.status_code == 200 else []
-        
-        # Get languages
-        languages_response = requests.get(f'https://api.github.com/repos/{owner}/{repo}/languages', verify=False)
-        languages_data = languages_response.json() if languages_response.status_code == 200 else {}
-        
-        return {
-            'name': repo_data.get('name'),
-            'description': repo_data.get('description', ''),
-            'language': repo_data.get('language', 'Unknown'),
-            'languages': list(languages_data.keys()),
-            'stars': repo_data.get('stargazers_count', 0),
-            'forks': repo_data.get('forks_count', 0),
-            'topics': repo_data.get('topics', []),
-            'contents': contents_data,
-            'default_branch': repo_data.get('default_branch', 'main'),
-            'created_at': repo_data.get('created_at'),
-            'updated_at': repo_data.get('updated_at'),
-        }, None
-    except Exception as e:
-        return None, str(e)
 
-def generate_documentation_prompt(repo_info, owner, repo):
-    """Generate a prompt for WatsonX to create onboarding documentation"""
+def fetch_github_repo_data(owner: str, repo: str):
+    """
+    Fetch repository metadata from the GitHub REST API.
+
+    Returns:
+        (repo_data_dict, None)  on success
+        (None, error_message)   on failure
+    """
+    headers = {'Accept': 'application/vnd.github+json'}
+
+    try:
+        repo_response = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}',
+            headers=headers,
+            verify=False,
+            timeout=15,
+        )
+        if repo_response.status_code == 404:
+            return None, f"Repository '{owner}/{repo}' not found. Make sure it exists and is public."
+        if repo_response.status_code == 403:
+            return None, "GitHub API rate limit exceeded. Please wait a moment and try again."
+        if repo_response.status_code != 200:
+            return None, f"GitHub API returned status {repo_response.status_code}."
+
+        repo_data = repo_response.json()
+
+        # Contents (root-level files)
+        contents_resp = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}/contents',
+            headers=headers,
+            verify=False,
+            timeout=15,
+        )
+        contents_data = contents_resp.json() if contents_resp.status_code == 200 else []
+
+        # Language breakdown
+        languages_resp = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}/languages',
+            headers=headers,
+            verify=False,
+            timeout=15,
+        )
+        languages_data = languages_resp.json() if languages_resp.status_code == 200 else {}
+
+        return {
+            'name':           repo_data.get('name', repo),
+            'description':    repo_data.get('description') or '',
+            'language':       repo_data.get('language') or 'Unknown',
+            'languages':      list(languages_data.keys()),
+            'stars':          repo_data.get('stargazers_count', 0),
+            'forks':          repo_data.get('forks_count', 0),
+            'topics':         repo_data.get('topics', []),
+            'contents':       contents_data if isinstance(contents_data, list) else [],
+            'default_branch': repo_data.get('default_branch', 'main'),
+            'created_at':     repo_data.get('created_at'),
+            'updated_at':     repo_data.get('updated_at'),
+        }, None
+
+    except requests.exceptions.Timeout:
+        return None, "Timed out while connecting to GitHub. Please try again."
+    except requests.exceptions.ConnectionError:
+        return None, "Could not connect to GitHub. Check your internet connection."
+    except Exception as e:
+        return None, f"Unexpected error fetching repository data: {e}"
+
+
+def build_prompt(repo_info: dict, owner: str, repo: str) -> str:
+    """Build the documentation-generation prompt for the AI model."""
     languages = ', '.join(repo_info['languages']) if repo_info['languages'] else repo_info['language']
-    topics = ', '.join(repo_info['topics']) if repo_info['topics'] else 'None'
-    
-    prompt = f"""Generate comprehensive onboarding documentation for a junior developer joining a project.
+    topics    = ', '.join(repo_info['topics'])    if repo_info['topics']    else 'None'
+    stars     = repo_info.get('stars', 0)
+    forks     = repo_info.get('forks', 0)
+
+    return f"""Generate comprehensive onboarding documentation for a junior developer joining a project.
 
 Repository: {owner}/{repo}
-Description: {repo_info['description']}
+Description: {repo_info['description'] or 'No description provided'}
 Primary Language: {repo_info['language']}
-Tech Stack: {languages}
-Topics: {topics}
+All Languages: {languages}
+Topics / Tags: {topics}
+Stars: {stars} | Forks: {forks}
 
-Create a detailed onboarding guide in Markdown format that includes:
+Write the documentation in Markdown. Include the following sections:
 
-1. **Project Overview**
-   - What the project does
-   - Key features and functionality
-   - Target audience or use case
+# {repo} — Developer Onboarding Guide
 
-2. **Technology Stack**
-   - Programming languages used
-   - Frameworks and libraries
-   - Development tools
+## 1. Project Overview
+- What this project does and why it exists
+- Key features and target audience
 
-3. **Getting Started**
-   - Prerequisites (software, tools, accounts needed)
-   - Installation steps
-   - Configuration requirements
-   - How to run the project locally
+## 2. Technology Stack
+- Languages, frameworks, and major libraries used
+- Development tools and runtime versions
 
-4. **Project Structure**
-   - Main directories and their purposes
-   - Key files and what they do
-   - Architecture overview
+## 3. Getting Started
+- Prerequisites (tools, accounts, and environment)
+- Step-by-step installation guide
+- Running the project locally
+- Environment variables / configuration
 
-5. **Development Workflow**
-   - How to make changes
-   - Testing procedures
-   - Code style guidelines
-   - Git workflow (branching, commits, PRs)
+## 4. Project Structure
+- Directory layout with explanations
+- Key files and their roles
+- Architecture overview
 
-6. **Common Tasks**
-   - How to add new features
-   - How to fix bugs
-   - How to run tests
-   - How to deploy
+## 5. Development Workflow
+- Branching strategy and commit conventions
+- Code style and linting rules
+- Testing procedures
+- Submitting pull requests
 
-7. **Resources**
-   - Documentation links
-   - Helpful tutorials
-   - Community resources
-   - Who to contact for help
+## 6. Common Tasks
+- Adding a new feature
+- Fixing a bug
+- Running the test suite
+- Deploying to production
 
-Make it beginner-friendly, clear, and actionable. Use examples where helpful."""
+## 7. Resources & Help
+- Official docs and tutorials
+- Community channels
+- Who to contact for help
 
-    return prompt
+Make every section actionable, beginner-friendly, and use examples where helpful."""
 
-@bp.route('/analyze', methods=['POST'])
-def analyze_repository():
-    """Analyze a GitHub repository and generate onboarding documentation"""
-    try:
-        # Get WatsonX service instance
-        watsonx_service = get_watsonx_service()
-        
-        data = request.get_json()
-        repo_url = data.get('repo_url')
-        
-        if not repo_url:
-            return jsonify({'error': 'Repository URL is required'}), 400
-        
-        # Extract owner and repo name
-        owner, repo = extract_repo_info(repo_url)
-        if not owner or not repo:
-            return jsonify({'error': 'Invalid GitHub repository URL'}), 400
-        
-        # Fetch repository data from GitHub
-        repo_info, error = fetch_github_repo_data(owner, repo)
-        if error:
-            return jsonify({'error': f'Failed to fetch repository data: {error}'}), 400
-        
-        # Generate documentation prompt
-        prompt = generate_documentation_prompt(repo_info, owner, repo)
-        
-        # Use WatsonX to generate documentation
-        print(f"[Analyze] Attempting to generate documentation with WatsonX...")
-        response = watsonx_service.generate_documentation(prompt)
-        
-        # Debug: Print the response to see what's happening
-        print(f"[Analyze] WatsonX Response: {response}")
-        
-        # Check if WatsonX is available and successful
-        if not response.get('success', False):
-            # Provide a fallback documentation template when WatsonX is not configured
-            error_msg = response.get('error', 'WatsonX AI not available')
-            print(f"[Analyze] WatsonX not available: {error_msg}")
-            
-            # repo_info is guaranteed to be a dict here (we checked for error earlier)
-            description = repo_info.get('description', 'No description provided') if repo_info else 'No description provided'
-            language = repo_info.get('language', 'Unknown') if repo_info else 'Unknown'
-            languages = repo_info.get('languages', []) if repo_info else []
-            tech_stack = ', '.join(languages) if languages else language
-            
-            documentation = f"""# {repo} - Developer Onboarding Guide
+
+def build_fallback_documentation(owner: str, repo: str, repo_info: dict) -> str:
+    """Return a plain template when WatsonX AI is unavailable."""
+    language  = repo_info.get('language', 'Unknown')
+    languages = repo_info.get('languages', [])
+    tech_stack = ', '.join(languages) if languages else language
+    description = repo_info.get('description') or 'No description provided'
+
+    return f"""# {repo} — Developer Onboarding Guide
+
+> **Note:** This is an auto-generated template. Configure IBM watsonx AI credentials for a fully AI-generated guide.
 
 ## Project Overview
 
-**Repository:** {owner}/{repo}
-**Description:** {description}
-**Primary Language:** {language}
-**Tech Stack:** {tech_stack}
+| Field | Value |
+|---|---|
+| Repository | `{owner}/{repo}` |
+| Description | {description} |
+| Primary Language | {language} |
+| Tech Stack | {tech_stack} |
 
 ## Getting Started
 
 ### Prerequisites
 - Git installed on your machine
-- {language} development environment set up
-- Basic knowledge of {language} programming
+- {language} development environment
+- Basic familiarity with {language}
 
-### Installation Steps
+### Installation
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/{owner}/{repo}.git
 cd {repo}
 ```
 
-2. Install dependencies (check the repository for specific instructions)
-
-3. Configure environment variables if needed
-
-4. Run the application
+Then install dependencies and configure environment variables as described in the repository's own README.
 
 ## Project Structure
 
-This is a {language} project. Explore the repository to understand:
-- Main application files
-- Configuration files
-- Documentation
-- Tests (if available)
+Explore the repository to understand:
+- Main application code
+- Configuration files (`.env`, `config.*`)
+- Tests (look for a `tests/` or `spec/` folder)
+- Documentation (`docs/`, `README.md`)
 
 ## Development Workflow
 
-1. Create a new branch for your feature
-2. Make your changes
-3. Test your changes thoroughly
-4. Submit a pull request
+1. Create a feature branch: `git checkout -b feature/my-feature`
+2. Make your changes and write tests
+3. Commit with a clear message: `git commit -m "feat: add my feature"`
+4. Open a pull request for review
 
 ## Resources
 
 - [Repository on GitHub](https://github.com/{owner}/{repo})
-- [GitHub Documentation](https://docs.github.com)
+- [GitHub Docs](https://docs.github.com)
 - [{language} Documentation](https://www.google.com/search?q={language}+documentation)
-
----
-
-**Note:** This is a basic template. For AI-generated comprehensive documentation, please configure IBM WatsonX AI credentials in the backend `.env` file.
-
-**Error:** {error_msg}
 """
-            ai_generated = False
+
+
+# ── Route ─────────────────────────────────────────────────────────────────────
+
+@bp.route('/analyze', methods=['POST'])
+def analyze_repository():
+    """Analyse a GitHub repository and return onboarding documentation."""
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body must be JSON.'}), 400
+
+        repo_url = (data.get('repo_url') or '').strip()
+        if not repo_url:
+            return jsonify({'success': False, 'error': 'Repository URL is required.'}), 400
+
+        # Parse GitHub URL
+        owner, repo = extract_repo_info(repo_url)
+        if not owner or not repo:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid GitHub URL. Expected format: https://github.com/owner/repo',
+            }), 400
+
+        # Fetch data from GitHub
+        print(f"[Analyze] Fetching data for {owner}/{repo}…")
+        repo_info, fetch_error = fetch_github_repo_data(owner, repo)
+        if fetch_error:
+            return jsonify({'success': False, 'error': fetch_error}), 400
+
+        # Try AI generation
+        watsonx_service = get_watsonx_service()
+        ai_generated = False
+        documentation = ''
+
+        if watsonx_service.is_available():
+            print("[Analyze] WatsonX is configured — generating AI documentation…")
+            prompt = build_prompt(repo_info, owner, repo)
+            wx_response = watsonx_service.generate_documentation(prompt)
+
+            if wx_response.get('success') and wx_response.get('content'):
+                documentation = wx_response['content']
+                ai_generated = True
+                print(f"[Analyze] ✓ AI documentation generated ({len(documentation)} chars)")
+            else:
+                # WatsonX call failed at runtime — fall back gracefully
+                wx_error = wx_response.get('error', 'Unknown WatsonX error')
+                print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback template")
+                documentation = build_fallback_documentation(owner, repo, repo_info)
         else:
-            # WatsonX successfully generated documentation
-            documentation = response.get('content', '')
-            ai_generated = True
-            print(f"[Analyze] [OK] Successfully generated AI documentation ({len(documentation)} chars)")
-        
-        # Prepare metadata (repo_info is guaranteed to be a dict here)
+            print("[Analyze] WatsonX not configured — using fallback template")
+            documentation = build_fallback_documentation(owner, repo, repo_info)
+
         metadata = {
-            'repo_name': repo,
-            'owner': owner,
-            'tech_stack': repo_info.get('languages', []) if repo_info else [],
-            'dependencies_count': len(repo_info.get('contents', [])) if repo_info else 0,
-            'generated_at': datetime.utcnow().isoformat(),
-            'ai_generated': ai_generated
+            'repo_name':          repo,
+            'owner':              owner,
+            'tech_stack':         repo_info.get('languages', []),
+            'dependencies_count': len(repo_info.get('contents', [])),
+            'generated_at':       datetime.utcnow().isoformat() + 'Z',
+            'ai_generated':       ai_generated,
         }
-        
+
         return jsonify({
-            'success': True,
+            'success':       True,
             'documentation': documentation,
-            'metadata': metadata,
-            'share_url': f'https://github.com/{owner}/{repo}',
-            'using_watsonx': metadata['ai_generated']
+            'metadata':      metadata,
+            'share_url':     f'https://github.com/{owner}/{repo}',
+            'using_watsonx': ai_generated,
         }), 200
-        
+
     except Exception as e:
+        print(f"[Analyze] Unhandled exception: {e}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error':   f'Internal server error: {e}',
         }), 500
-
-# Made with Bob

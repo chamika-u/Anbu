@@ -1,4 +1,4 @@
-/* App-specific styles */
+/* ── Root ───────────────────────────────────────────────────────────────── */
 #root {
   width: 100%;
   min-height: 100vh;
@@ -6,12 +6,7 @@
   flex-direction: column;
 }
 
-/* Smooth transitions */
-* {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-/* Button hover effects */
+/* ── Interactive elements ───────────────────────────────────────────────── */
 button {
   cursor: pointer;
   user-select: none;
@@ -22,58 +17,27 @@ button:disabled {
   opacity: 0.6;
 }
 
-/* Link styles */
+/* Selective transitions — only on interactive elements, not all * */
+button,
+a,
+input,
+textarea,
+select {
+  transition: background-color 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease, box-shadow 0.15s ease,
+              opacity 0.15s ease;
+}
+
+/* ── Links ──────────────────────────────────────────────────────────────── */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Focus styles for accessibility */
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #0f62fe;
-  outline-offset: 2px;
-}
-
-/* Custom scrollbar for documentation viewer */
-.markdown-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.markdown-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.markdown-content::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.markdown-content::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Responsive utilities */
+/* ── Responsive utilities ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
   }
 }
-
-/* Print styles */
-@media print {
-  header,
-  footer,
-  button {
-    display: none !important;
-  }
-
-  .markdown-content {
-    max-width: 100% !important;
-  }
-}
-
-/* Made with Bob */
