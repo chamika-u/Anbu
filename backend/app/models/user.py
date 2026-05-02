@@ -9,6 +9,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # TODO: encrypt this token at rest before production deployment
+    github_token = db.Column(db.String(255), nullable=True)
     
     analyses = db.relationship('RepositoryAnalysis', backref='user', lazy=True)
     
@@ -22,5 +24,6 @@ class User(db.Model):
         return {
             'id': self.id,
             'email': self.email,
+            'has_github_token': bool(self.github_token),
             'created_at': self.created_at.isoformat() + 'Z'
         }

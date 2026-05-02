@@ -95,3 +95,32 @@ def get_me(user):
         'success': True,
         'user': user.to_dict()
     }), 200
+
+
+@bp.route('/github-token', methods=['POST'])
+@require_auth
+def save_github_token(user):
+    """Save or update the user's GitHub Personal Access Token."""
+    data = request.get_json(silent=True) or {}
+    token = data.get('github_token', '').strip()
+
+    if not token:
+        return jsonify({'success': False, 'error': 'github_token is required'}), 400
+
+    # Basic sanity check — GitHub PATs start with ghp_ or github_pat_
+    if not (token.startswith('ghp_') or token.startswith('github_pat_') or len(token) >= 20):
+        return jsonify({'success': False, 'error': 'Invalid GitHub token format'}), 400
+
+    user.github_token = token
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'GitHub token saved successfully', 'user': user.to_dict()}), 200
+
+
+@bp.route('/github-token', methods=['DELETE'])
+@require_auth
+def delete_github_token(user):
+    """Remove the user's stored GitHub Personal Access Token."""
+    user.github_token = None
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'GitHub token removed', 'user': user.to_dict()}), 200
+

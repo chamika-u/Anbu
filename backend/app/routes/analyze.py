@@ -29,15 +29,20 @@ def extract_repo_info(repo_url: str):
     return None, None
 
 
-def fetch_github_repo_data(owner: str, repo: str):
+def fetch_github_repo_data(owner: str, repo: str, token: str = None):
     """
     Fetch repository metadata from the GitHub REST API.
+
+    Args:
+        token: Optional GitHub Personal Access Token for private repos.
 
     Returns:
         (repo_data_dict, None)  on success
         (None, error_message)   on failure
     """
     headers = {'Accept': 'application/vnd.github+json'}
+    if token:
+        headers['Authorization'] = f'token {token}'
 
     try:
         repo_response = requests.get(
@@ -47,9 +52,11 @@ def fetch_github_repo_data(owner: str, repo: str):
             timeout=15,
         )
         if repo_response.status_code == 404:
-            return None, f"Repository '{owner}/{repo}' not found. Make sure it exists and is public."
+            return None, f"Repository '{owner}/{repo}' not found. Make sure it exists and is public (or add a GitHub token for private repos)."
+        if repo_response.status_code == 401:
+            return None, "Invalid GitHub token. Please check the token saved in your dashboard."
         if repo_response.status_code == 403:
-            return None, "GitHub API rate limit exceeded. Please wait a moment and try again."
+            return None, "GitHub API rate limit exceeded or insufficient token permissions. Please wait or check your token scope."
         if repo_response.status_code != 200:
             return None, f"GitHub API returned status {repo_response.status_code}."
 
@@ -86,6 +93,7 @@ def fetch_github_repo_data(owner: str, repo: str):
             'default_branch': default_branch,
             'created_at':     repo_data.get('created_at'),
             'updated_at':     repo_data.get('updated_at'),
+            'private':        repo_data.get('private', False),
         }, None
 
     except requests.exceptions.Timeout:
@@ -220,9 +228,16 @@ def analyze_repository():
 
         def generate():
             try:
+                # Resolve GitHub token from logged-in user (enables private repo access)
+                github_token = None
+                current_user = get_optional_user()
+                if current_user and current_user.github_token:
+                    github_token = current_user.github_token
+                    print(f"[Analyze] User {current_user.id} has a GitHub token — private repos enabled.")
+
                 yield f"data: {json.dumps({'status': 'progress', 'message': f'Connecting to GitHub to fetch {owner}/{repo}...'})}\n\n"
                 print(f"[Analyze] Fetching data for {owner}/{repo}…")
-                repo_info, fetch_error = fetch_github_repo_data(owner, repo)
+                repo_info, fetch_error = fetch_github_repo_data(owner, repo, token=github_token)
                 if fetch_error:
                     yield f"data: {json.dumps({'status': 'error', 'error': fetch_error})}\n\n"
                     return
@@ -306,6 +321,7 @@ def analyze_repository():
                     'generated_at':       datetime.utcnow().isoformat() + 'Z',
                     'ai_generated':       ai_generated,
                     'checklist':          checklist,
+                    'is_private':         repo_info.get('private', False),
                 }
 
                 result = {

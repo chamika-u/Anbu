@@ -8,7 +8,6 @@ interface RecentAnalysesProps {
 const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
   const [history, setHistory] = useState<HistoryAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isShowingAll, setIsShowingAll] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -25,7 +24,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
   }, []);
 
   const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation(); // Prevent row click
     if (!window.confirm('Are you sure you want to delete this analysis? This action cannot be undone.')) return;
     
     const success = await deleteAnalysis(id);
@@ -123,7 +122,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
         </div>
       </div>
 
-      {/* ── Recent Projects Grid ───────────────────────────────────────── */}
+      {/* ── Repositories Table ─────────────────────────────────────────── */}
       <h3 className="text-xl font-bold text-ibm-gray mb-6 flex items-center gap-2">
         <svg className="w-5 h-5 text-ibm-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -143,7 +142,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
             You haven't analyzed any repositories on this account. Use the search bar above to generate your first onboarding documentation!
           </p>
         </div>
-      ) : isShowingAll ? (
+      ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -163,7 +162,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                   const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
                   
                   return (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => onSelect(item)}>
                       <td className="px-6 py-4">
                         <div className="font-bold text-ibm-gray text-base">{item.repo_name}</div>
                         <div className="text-sm text-gray-500">{item.owner}</div>
@@ -175,6 +174,11 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                               {tech}
                             </span>
                           ))}
+                          {item.metadata.tech_stack && item.metadata.tech_stack.length > 3 && (
+                            <span className="text-xs font-medium bg-gray-50 text-gray-400 px-2 py-1 rounded-md">
+                              +{item.metadata.tech_stack.length - 3}
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -191,7 +195,6 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3">
                           <button 
-                            onClick={() => onSelect(item)}
                             className="text-ibm-blue font-medium hover:text-blue-700 hover:underline text-sm"
                           >
                             View Docs
@@ -213,98 +216,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
               </tbody>
             </table>
           </div>
-          <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-            <button 
-              onClick={() => setIsShowingAll(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-ibm-gray bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
-            >
-              Back to Grid
-            </button>
-          </div>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {history.slice(0, 3).map((item) => (
-              <div 
-                key={item.id}
-                onClick={() => onSelect(item)}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group relative"
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors pr-6">
-                    {item.repo_name}
-                  </h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full whitespace-nowrap uppercase tracking-tighter">
-                      {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                    </span>
-                    <button 
-                      onClick={(e) => handleDelete(e, item.id)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-all -mr-1"
-                      title="Delete analysis"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                
-                <p className="text-xs text-gray-400 mb-4 truncate">
-                  {item.owner}/{item.repo_name}
-                </p>
-
-                {/* Mini Progress Bar */}
-                {item.metadata.checklist && item.metadata.checklist.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-medium text-gray-500">Tasks Completed</span>
-                      <span className="text-xs font-bold text-ibm-blue">
-                        {Object.values(item.progress || {}).filter(Boolean).length} / {item.metadata.checklist.length}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                      <div 
-                        className="bg-ibm-blue h-1.5 rounded-full transition-all duration-500"
-                        style={{ 
-                          width: `${Math.round((Object.values(item.progress || {}).filter(Boolean).length / item.metadata.checklist.length) * 100)}%` 
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap gap-1.5">
-                  {item.metadata.tech_stack?.slice(0, 3).map((tech, i) => (
-                    <span key={i} className="text-xs font-medium bg-blue-50 text-ibm-blue px-2 py-1 rounded-md">
-                      {tech}
-                    </span>
-                  ))}
-                  {item.metadata.tech_stack && item.metadata.tech_stack.length > 3 && (
-                    <span className="text-xs font-medium bg-gray-50 text-gray-400 px-2 py-1 rounded-md">
-                      +{item.metadata.tech_stack.length - 3}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {history.length > 3 && (
-            <div className="mt-8 text-center">
-              <button 
-                onClick={() => setIsShowingAll(true)}
-                className="px-6 py-2.5 bg-white border border-gray-200 shadow-sm text-ibm-gray font-medium rounded-xl hover:border-ibm-blue hover:text-ibm-blue transition-colors inline-flex items-center gap-2"
-              >
-                See all repositories
-                <span className="bg-gray-100 text-gray-600 text-xs py-0.5 px-2 rounded-full font-bold">
-                  {history.length}
-                </span>
-              </button>
-            </div>
-          )}
-        </>
       )}
     </div>
   );

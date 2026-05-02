@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="https://github.com/yourusername/anbu"
+                  href="https://github.com/chamika-u/Anbu"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-ibm-teal transition-colors"
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://github.com/yourusername/anbu"
+                href="https://github.com/chamika-u/Anbu"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-ibm-teal transition-colors"

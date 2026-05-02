@@ -25,6 +25,7 @@ api.interceptors.request.use((config) => {
 export interface User {
   id: number;
   email: string;
+  has_github_token: boolean;
   created_at: string;
 }
 
@@ -57,6 +58,7 @@ export interface RepoMetadata {
   dependencies_count: number;
   generated_at: string;
   ai_generated?: boolean;
+  is_private?: boolean;
   checklist?: ChecklistTask[];
   progress?: Record<string, boolean>;
 }
@@ -370,6 +372,26 @@ export const getMe = async (): Promise<AuthResponse> => {
 
 export const logoutUser = () => {
   localStorage.removeItem('anbu_token');
+};
+
+/** Save or update the user's GitHub Personal Access Token */
+export const updateGitHubToken = async (token: string): Promise<AuthResponse> => {
+  try {
+    const response = await api.post<AuthResponse>('/api/auth/github-token', { github_token: token });
+    return response.data;
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Failed to save GitHub token'), { cause: error });
+  }
+};
+
+/** Remove the user's stored GitHub Personal Access Token */
+export const deleteGitHubToken = async (): Promise<AuthResponse> => {
+  try {
+    const response = await api.delete<AuthResponse>('/api/auth/github-token');
+    return response.data;
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Failed to remove GitHub token'), { cause: error });
+  }
 };
 
 export default api;
