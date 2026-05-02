@@ -24,12 +24,13 @@ def create_app():
     db.init_app(app)
     
     # Register blueprints
-    from app.routes import chat, documents, health, analyze, history
+    from app.routes import chat, documents, health, analyze, history, auth
     app.register_blueprint(chat.bp)
     app.register_blueprint(documents.bp)
     app.register_blueprint(health.bp)
     app.register_blueprint(analyze.bp)
     app.register_blueprint(history.bp)
+    app.register_blueprint(auth.bp)
     
     # Create database tables
     with app.app_context():

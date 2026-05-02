@@ -8,6 +8,7 @@ import urllib3
 
 from app import db
 from app.models.analysis import RepositoryAnalysis
+from app.routes.auth import get_optional_user
 
 # Suppress noisy SSL warnings for GitHub API calls
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -372,12 +373,14 @@ def analyze_repository():
 
         # Save to database
         try:
+            user = get_optional_user()
             analysis_record = RepositoryAnalysis(
                 repo_url=repo_url,
                 owner=owner,
                 repo_name=repo,
                 documentation=documentation,
-                metadata_json=json.dumps(metadata)
+                metadata_json=json.dumps(metadata),
+                user_id=user.id if user else None
             )
             db.session.add(analysis_record)
             db.session.commit()

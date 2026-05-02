@@ -9,10 +9,36 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 180000, // 3 minutes – AI generation can be slow
+  timeout: 180000, // 3 minutes
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('anbu_token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+export interface User {
+  id: number;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  token?: string;
+  user?: User;
+  error?: string;
+}
+
+export interface AuthRequest {
+  email: string;
+  password?: string;
+}
 
 export interface AnalyzeRequest {
   repo_url: string;
@@ -187,6 +213,7 @@ export interface HistoryAnalysis {
   repo_name: string;
   documentation: string;
   metadata: RepoMetadata;
+  progress: Record<string, boolean>;
   created_at: string;
 }
 
@@ -207,6 +234,53 @@ export const getHistory = async (): Promise<HistoryAnalysis[]> => {
   } catch (error) {
     throw new Error(extractErrorMessage(error, 'Failed to fetch history'), { cause: error });
   }
+};
+
+/** Sync progress to the backend */
+export const updateProgress = async (analysisId: number, progress: Record<string, boolean>): Promise<void> => {
+  try {
+    await api.post(`/api/history/${analysisId}/progress`, { progress });
+  } catch (error) {
+    console.error('Failed to sync progress:', error);
+  }
+};
+
+export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
+  try {
+    const response = await api.post<AuthResponse>('/api/auth/login', { email, password });
+    if (response.data.token) {
+      localStorage.setItem('anbu_token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Login failed'), { cause: error });
+  }
+};
+
+export const registerUser = async (email: string, password: string): Promise<AuthResponse> => {
+  try {
+    const response = await api.post<AuthResponse>('/api/auth/register', { email, password });
+    if (response.data.token) {
+      localStorage.setItem('anbu_token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Registration failed'), { cause: error });
+  }
+};
+
+export const getMe = async (): Promise<AuthResponse> => {
+  try {
+    const response = await api.get<AuthResponse>('/api/auth/me');
+    return response.data;
+  } catch (error) {
+    localStorage.removeItem('anbu_token');
+    throw new Error(extractErrorMessage(error, 'Authentication failed'), { cause: error });
+  }
+};
+
+export const logoutUser = () => {
+  localStorage.removeItem('anbu_token');
 };
 
 export default api;
