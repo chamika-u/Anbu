@@ -1,4 +1,4 @@
-# 🚀 Anbu - AI-Powered Developer Onboarding Platform
+#  Anbu - AI-Powered Developer Onboarding Platform
 
 > **Anbu** (அன்பு) means "Love" in Tamil - We help companies show love to their new developers through intelligent onboarding.
 
@@ -6,13 +6,13 @@
 
 ---
 
-## 📖 About Anbu
+##  About Anbu
 
 Anbu is an AI-powered web application that automatically generates comprehensive, beginner-friendly onboarding documentation for any GitHub repository. It helps newly hired junior developers quickly understand codebases, tech stacks, and project structures - reducing onboarding time from weeks to hours.
 
 ---
 
-## 🎯 Problem Statement
+##  Problem Statement
 
 New developers joining a company face significant challenges:
 
@@ -26,35 +26,35 @@ New developers joining a company face significant challenges:
 
 ---
 
-## 💡 Our Solution
+##  Our Solution
 
 Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository and automatically generate:
 
-- 📋 **Project Overview** - Clear explanation of what the project does and its purpose
-- 🛠️ **Tech Stack Breakdown** - Detailed list of technologies, frameworks, and tools used
-- ⚙️ **Setup Instructions** - Step-by-step installation and configuration guide
-- 🏗️ **Architecture Overview** - High-level system design and structure
-- 📁 **Project Structure** - Directory tree with explanations of key files
-- 🚀 **Getting Started Guide** - First commands to run and development workflow
-- 🔑 **Key Concepts** - Important patterns, abstractions, and design decisions
-- 🐛 **Troubleshooting** - Common issues and their solutions
+-  **Project Overview** - Clear explanation of what the project does and its purpose
+-  **Tech Stack Breakdown** - Detailed list of technologies, frameworks, and tools used
+-  **Setup Instructions** - Step-by-step installation and configuration guide
+-  **Architecture Overview** - High-level system design and structure
+-  **Project Structure** - Directory tree with explanations of key files
+-  **Getting Started Guide** - First commands to run and development workflow
+-  **Key Concepts** - Important patterns, abstractions, and design decisions
+-  **Troubleshooting** - Common issues and their solutions
 
 **Impact**: Reduce onboarding time from weeks to hours, allowing new developers to contribute faster.
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 ### Core Capabilities
 
-- **🔗 Public Repository Support** - Paste any GitHub URL to analyze
-- **🤖 AI-Powered Analysis** - IBM watsonx AI understands code structure and patterns
-- **📝 Comprehensive Documentation** - Generates beginner-friendly, actionable guides
-- **💾 Persistent Dashboard** - Save your generated documentation to a personal dashboard
-- **🔄 Progress Tracking** - Keep track of your onboarding progress natively within the app
-- **⚡ Real-time Updates** - Live, repository-specific Server-Sent Events (SSE) progress updates during analysis
-- **👀 Instant Preview & Export** - View documentation in browser or download as Markdown/PDF
-- **🔐 User Authentication** - Secure login and registration for personalized experiences
+- ** Public Repository Support** - Paste any GitHub URL to analyze
+- ** AI-Powered Analysis** - IBM watsonx AI understands code structure and patterns
+- ** Comprehensive Documentation** - Generates beginner-friendly, actionable guides
+- ** Persistent Dashboard** - Save your generated documentation to a personal dashboard
+- ** Progress Tracking** - Keep track of your onboarding progress natively within the app
+- ** Real-time Updates** - Live, repository-specific Server-Sent Events (SSE) progress updates during analysis
+- ** Instant Preview & Export** - View documentation in browser or download as Markdown/PDF
+- ** User Authentication** - Secure login and registration for personalized experiences
 
 ### Technical Highlights
 
@@ -66,7 +66,7 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 - **React** - Modern UI library for building interactive interfaces
@@ -93,81 +93,81 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 
 ---
 
-## 🎯 Project Scope
+##  Project Scope
 
 ### MVP Features (Current Implementation)
 
-✅ **Repository Analysis**
+ **Repository Analysis**
 - Support for public GitHub repositories
 - Automatic tech stack detection
 - Dependency extraction
 - Project structure analysis
 
-✅ **AI Documentation Generation**
+ **AI Documentation Generation**
 - Comprehensive onboarding guides
 - Beginner-friendly explanations
 - Step-by-step instructions
 - Code examples and best practices
 
-✅ **User Interface**
+ **User Interface**
 - Clean, intuitive web interface
 - Real-time progress indicators
 - Documentation preview
 - Download functionality
 
-✅ **Cloud Integration & Persistence**
+ **Cloud Integration & Persistence**
 - PostgreSQL database integration
 - Persistent, user-specific dashboard
 - Interactive progress state synchronization
 
 ### Out of Scope (Future Enhancements)
 
-❌ **Private Repository Support** - Requires OAuth implementation
-❌ **Team Collaboration** - Shared workspaces and comments
-❌ **Version Control** - Track documentation changes over time
-❌ **Analytics Dashboard** - Usage metrics and insights
+ **Private Repository Support** - Requires OAuth implementation
+ **Team Collaboration** - Shared workspaces and comments
+ **Version Control** - Track documentation changes over time
+ **Analytics Dashboard** - Usage metrics and insights
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                        User                              │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              React Frontend (Vercel)                     │
-│  • Repository URL Input                                  │
-│  • Documentation Viewer                                  │
-│  • Download & Share Features                             │
-└────────────────────┬────────────────────────────────────┘
-                     │ HTTPS/REST API
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│         Flask Backend (IBM Code Engine)                  │
-│  • Request Validation                                    │
-│  • Repository Analysis                                   │
-│  • AI Integration                                        │
-│  • Document Generation                                   │
-└──────┬──────────────┬──────────────┬────────────────────┘
-       │              │              │
-       ▼              ▼              ▼
-┌──────────┐   ┌─────────────┐   ┌──────────────────┐
-│ GitHub   │   │  IBM        │   │  IBM Cloud       │
-│   API    │   │ watsonx AI  │   │ Object Storage   │
-│          │   │             │   │                  │
-│ • Fetch  │   │ • Analyze   │   │ • Store Docs     │
-│   Repos  │   │   Code      │   │ • Generate URLs  │
-│ • Get    │   │ • Generate  │   │ • Serve Files    │
-│   Files  │   │   Docs      │   │                  │
-└──────────┘   └─────────────┘   └──────────────────┘
+
+                        User                              
+
+                     
+                     
+
+              React Frontend (Vercel)                     
+   Repository URL Input                                  
+   Documentation Viewer                                  
+   Download & Share Features                             
+
+                      HTTPS/REST API
+                     
+
+         Flask Backend (IBM Code Engine)                  
+   Request Validation                                    
+   Repository Analysis                                   
+   AI Integration                                        
+   Document Generation                                   
+
+                                   
+                                   
+      
+ GitHub        IBM             IBM Cloud       
+   API        watsonx AI      Object Storage   
+                                               
+  Fetch       Analyze        Store Docs     
+   Repos        Code           Generate URLs  
+  Get         Generate       Serve Files    
+   Files        Docs                           
+      
 ```
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -181,8 +181,8 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/anbu.git
-cd anbu
+git clone https://github.com/chamika-u/Anbu.git
+cd Anbu
 ```
 
 #### 2. Backend Setup
@@ -230,7 +230,7 @@ npm run dev
 
 Frontend will run on `http://localhost:5173`
 
-### 🐳 Running with Docker (Recommended)
+###  Running with Docker (Recommended)
 
 The easiest way to run the entire system (Frontend, Backend, and Database) is using Docker Compose.
 
@@ -279,7 +279,7 @@ VITE_API_URL=http://localhost:5000
 
 ---
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### Generating Documentation
 
@@ -295,17 +295,17 @@ VITE_API_URL=http://localhost:5000
 
 ### Supported Repository Types
 
-- ✅ JavaScript/TypeScript (React, Vue, Angular, Node.js)
-- ✅ Python (Django, Flask, FastAPI)
-- ✅ Java (Spring Boot, Maven, Gradle)
-- ✅ Go (Go modules)
-- ✅ Ruby (Rails, Sinatra)
-- ✅ PHP (Laravel, Symfony)
-- ✅ And many more...
+-  JavaScript/TypeScript (React, Vue, Angular, Node.js)
+-  Python (Django, Flask, FastAPI)
+-  Java (Spring Boot, Maven, Gradle)
+-  Go (Go modules)
+-  Ruby (Rails, Sinatra)
+-  PHP (Laravel, Symfony)
+-  And many more...
 
 ---
 
-## 📊 API Documentation
+##  API Documentation
 
 ### POST `/api/analyze`
 
@@ -356,7 +356,7 @@ Check API health status.
 
 ---
 
-## 🎨 Design Philosophy
+##  Design Philosophy
 
 ### User Experience Principles
 
@@ -376,7 +376,7 @@ Check API health status.
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Here's how you can help:
 
@@ -395,13 +395,13 @@ We welcome contributions! Here's how you can help:
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **IBM watsonx AI** - Powerful foundation models for code analysis
 - **IBM Cloud** - Reliable infrastructure and services
@@ -410,15 +410,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Contact & Support
+##  Contact & Support
 
-- **Project Repository**: [github.com/yourusername/anbu](https://github.com/yourusername/anbu)
-- **Issues**: [github.com/yourusername/anbu/issues](https://github.com/yourusername/anbu/issues)
+- **Project Repository**: [github.com/chamika-u/Anbu](https://github.com/chamika-u/Anbu)
+- **Issues**: [github.com/chamika-u/Anbu/issues](https://github.com/chamika-u/Anbu/issues)
 - **Email**: your.email@example.com
 
 ---
 
-## 🌟 Project Status
+##  Project Status
 
 **Current Version**: 1.0.0 (MVP)  
 **Status**: Active Development  
@@ -426,6 +426,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ (Anbu) for developers, by developers**
+**Built with Anbu for developers, by developers**
 
 *Empowering junior developers to succeed from day one*
