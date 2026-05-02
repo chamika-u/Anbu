@@ -172,12 +172,40 @@ export const getDocuments = async (): Promise<DocumentUploadResponse[]> => {
   }
 };
 
-/** Delete a document by ID. */
 export const deleteDocument = async (documentId: string): Promise<void> => {
   try {
     await api.delete(`/api/documents/${documentId}`);
   } catch (error) {
     throw new Error(extractErrorMessage(error, 'Failed to delete document'), { cause: error });
+  }
+};
+
+export interface HistoryAnalysis {
+  id: number;
+  repo_url: string;
+  owner: string;
+  repo_name: string;
+  documentation: string;
+  metadata: RepoMetadata;
+  created_at: string;
+}
+
+export interface HistoryResponse {
+  success: boolean;
+  history?: HistoryAnalysis[];
+  error?: string;
+}
+
+/** Fetch previously analyzed repositories history */
+export const getHistory = async (): Promise<HistoryAnalysis[]> => {
+  try {
+    const response = await api.get<HistoryResponse>('/api/history');
+    if (!response.data.success || !response.data.history) {
+      throw new Error(response.data.error || 'Failed to fetch history');
+    }
+    return response.data.history;
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Failed to fetch history'), { cause: error });
   }
 };
 

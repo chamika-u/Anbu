@@ -2,8 +2,12 @@ from flask import Blueprint, request, jsonify
 from app.services.watsonx_service import get_watsonx_service
 import requests
 import re
+import json
 from datetime import datetime
 import urllib3
+
+from app import db
+from app.models.analysis import RepositoryAnalysis
 
 # Suppress noisy SSL warnings for GitHub API calls
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -365,6 +369,23 @@ def analyze_repository():
             'ai_generated':       ai_generated,
             'checklist':          checklist,
         }
+
+        # Save to database
+        try:
+            analysis_record = RepositoryAnalysis(
+                repo_url=repo_url,
+                owner=owner,
+                repo_name=repo,
+                documentation=documentation,
+                metadata_json=json.dumps(metadata)
+            )
+            db.session.add(analysis_record)
+            db.session.commit()
+            print(f"[Analyze] Saved analysis to database with ID: {analysis_record.id}")
+            metadata['id'] = analysis_record.id
+        except Exception as db_err:
+            print(f"[Analyze] Database save error: {db_err}")
+            db.session.rollback()
 
         return jsonify({
             'success':       True,

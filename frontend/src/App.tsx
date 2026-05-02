@@ -5,7 +5,8 @@ import RepositoryInput from './components/RepositoryInput';
 import LoadingSpinner from './components/LoadingSpinner';
 import DocumentationViewer from './components/DocumentationViewer';
 import Toast from './components/Toast';
-import { analyzeRepository, type AnalyzeResponse, type RepoMetadata } from './services/api';
+import RecentAnalyses from './components/RecentAnalyses';
+import { analyzeRepository, type AnalyzeResponse, type RepoMetadata, type HistoryAnalysis } from './services/api';
 import './App.css';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -70,6 +71,18 @@ function App() {
       setIsLoading(false);
       setLoadingMessage(LOADING_MESSAGES[0]);
     }
+  };
+
+  const handleSelectHistory = (historyItem: HistoryAnalysis) => {
+    // Restore the full result from history without making a network request
+    setResult({
+      success: true,
+      documentation: historyItem.documentation,
+      metadata: historyItem.metadata,
+      share_url: `https://github.com/${historyItem.owner}/${historyItem.repo_name}`,
+      using_watsonx: historyItem.metadata.ai_generated,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDownload = () => {
@@ -304,6 +317,11 @@ function App() {
               </p>
             </div>
           </div>
+        )}
+
+        {/* ── Recent Analyses (Database History) ────────────────────────── */}
+        {showHero && (
+          <RecentAnalyses onSelect={handleSelectHistory} />
         )}
       </main>
 
