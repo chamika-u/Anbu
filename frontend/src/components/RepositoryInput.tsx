@@ -51,7 +51,7 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
   const hasError = Boolean(validationError);
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full">
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div>
           <label
