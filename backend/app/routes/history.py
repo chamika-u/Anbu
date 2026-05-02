@@ -5,7 +5,7 @@ from app import db
 
 bp = Blueprint('history', __name__, url_prefix='/api/history')
 
-@bp.route('/', methods=['GET'])
+@bp.route('', methods=['GET'])
 @require_auth
 def get_history(user):
     """Get all previously generated repository documentations for the logged-in user."""
