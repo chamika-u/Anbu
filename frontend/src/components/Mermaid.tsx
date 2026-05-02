@@ -95,8 +95,6 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
       dangerouslySetInnerHTML={{ __html: svgCode }} 
     />
   );
-
-  );
 };
 
 export default Mermaid;
