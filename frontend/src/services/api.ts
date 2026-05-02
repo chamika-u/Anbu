@@ -18,6 +18,11 @@ export interface AnalyzeRequest {
   repo_url: string;
 }
 
+export interface ChecklistTask {
+  id: string;
+  title: string;
+}
+
 export interface RepoMetadata {
   repo_name: string;
   owner: string;
@@ -25,6 +30,7 @@ export interface RepoMetadata {
   dependencies_count: number;
   generated_at: string;
   ai_generated?: boolean;
+  checklist?: ChecklistTask[];
 }
 
 export interface AnalyzeResponse {

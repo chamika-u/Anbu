@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Mermaid from './Mermaid';
+import OnboardingChecklist from './OnboardingChecklist';
 import type { RepoMetadata } from '../services/api';
 
 interface DocumentationViewerProps {
@@ -93,6 +94,11 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Interactive Checklist ───────────────────────────────────────── */}
+      {metadata?.checklist && metadata.checklist.length > 0 && (
+        <OnboardingChecklist repoName={metadata.repo_name} tasks={metadata.checklist} />
       )}
 
       {/* ── View tabs ────────────────────────────────────────────────────── */}
