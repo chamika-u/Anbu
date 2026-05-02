@@ -124,13 +124,13 @@ cd {repo}
 
 Then install dependencies as described in the repository's README.
 
-## 4. Development Workflow
+## 5. Development Workflow
 1. Create a feature branch: `git checkout -b feature/my-feature`
 2. Make your changes and write tests
 3. Commit with a clear message: `git commit -m "feat: add my feature"`
 4. Open a pull request for review
 
-## 5. Resources & Help
+## 6. Resources & Help
 - [Repository on GitHub](https://github.com/{owner}/{repo})
 - [GitHub Docs](https://docs.github.com)
 - [{language} Documentation](https://www.google.com/search?q={language}+documentation)

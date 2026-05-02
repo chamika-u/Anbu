@@ -285,14 +285,14 @@ def analyze_repository():
                         print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback")
                         yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using default code...'})}\n\n"
                         # Use default service as fallback
-                        df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
-                        documentation = df_response['content']
+                        df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description'), 'tree': repo_info.get('tree', [])})
+                        documentation = df_response.get('content') or ''
                 else:
                     print("[Analyze] WatsonX not configured — using default code")
                     yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation using default code...'})}\n\n"
                     # Use default service
-                    df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
-                    documentation = df_response['content']
+                    df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description'), 'tree': repo_info.get('tree', [])})
+                    documentation = df_response.get('content') or ''
 
                 yield f"data: {json.dumps({'status': 'progress', 'message': 'Finalising documentation and checklist...'})}\n\n"
                 # Generate Checklist
