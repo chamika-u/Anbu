@@ -8,6 +8,7 @@ interface RecentAnalysesProps {
 const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
   const [history, setHistory] = useState<HistoryAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isShowingAll, setIsShowingAll] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -130,62 +131,146 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
             You haven't analyzed any repositories on this account. Use the search bar above to generate your first onboarding documentation!
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {history.map((item) => (
-            <div 
-              key={item.id}
-              onClick={() => onSelect(item)}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group"
+      ) : isShowingAll ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">Repository</th>
+                  <th className="px-6 py-4 font-medium">Tech Stack</th>
+                  <th className="px-6 py-4 font-medium">Progress</th>
+                  <th className="px-6 py-4 font-medium">Analyzed On</th>
+                  <th className="px-6 py-4 font-medium text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {history.map((item) => {
+                  const totalTasks = item.metadata.checklist?.length || 0;
+                  const completedTasks = Object.values(item.progress || {}).filter(Boolean).length;
+                  const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+                  
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-ibm-gray text-base">{item.repo_name}</div>
+                        <div className="text-sm text-gray-500">{item.owner}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {item.metadata.tech_stack?.slice(0, 3).map((tech, i) => (
+                            <span key={i} className="text-xs font-medium bg-blue-50 text-ibm-blue px-2 py-1 rounded-md">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                            <div className="bg-ibm-blue h-1.5 rounded-full" style={{ width: `${percent}%` }}></div>
+                          </div>
+                          <span className="text-sm font-medium text-gray-600">{percent}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button 
+                          onClick={() => onSelect(item)}
+                          className="text-ibm-blue font-medium hover:text-blue-700 hover:underline text-sm"
+                        >
+                          View Docs
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+            <button 
+              onClick={() => setIsShowingAll(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-ibm-gray bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
             >
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors">
-                  {item.repo_name}
-                </h4>
-                <span className="text-xs font-medium bg-gray-100 text-gray-500 px-2 py-1 rounded-full whitespace-nowrap">
-                  {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-              
-              <p className="text-sm text-gray-500 mb-4 truncate">
-                {item.owner}/{item.repo_name}
-              </p>
-
-              {/* Mini Progress Bar */}
-              {item.metadata.checklist && item.metadata.checklist.length > 0 && (
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-medium text-gray-500">Tasks Completed</span>
-                    <span className="text-xs font-bold text-ibm-blue">
-                      {Object.values(item.progress || {}).filter(Boolean).length} / {item.metadata.checklist.length}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className="bg-ibm-blue h-1.5 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${Math.round((Object.values(item.progress || {}).filter(Boolean).length / item.metadata.checklist.length) * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-1.5">
-                {item.metadata.tech_stack?.slice(0, 3).map((tech, i) => (
-                  <span key={i} className="text-xs font-medium bg-blue-50 text-ibm-blue px-2 py-1 rounded-md">
-                    {tech}
-                  </span>
-                ))}
-                {item.metadata.tech_stack && item.metadata.tech_stack.length > 3 && (
-                  <span className="text-xs font-medium bg-gray-50 text-gray-400 px-2 py-1 rounded-md">
-                    +{item.metadata.tech_stack.length - 3}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+              Back to Grid
+            </button>
+          </div>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {history.slice(0, 3).map((item) => (
+              <div 
+                key={item.id}
+                onClick={() => onSelect(item)}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors">
+                    {item.repo_name}
+                  </h4>
+                  <span className="text-xs font-medium bg-gray-100 text-gray-500 px-2 py-1 rounded-full whitespace-nowrap">
+                    {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+                
+                <p className="text-sm text-gray-500 mb-4 truncate">
+                  {item.owner}/{item.repo_name}
+                </p>
+
+                {/* Mini Progress Bar */}
+                {item.metadata.checklist && item.metadata.checklist.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-medium text-gray-500">Tasks Completed</span>
+                      <span className="text-xs font-bold text-ibm-blue">
+                        {Object.values(item.progress || {}).filter(Boolean).length} / {item.metadata.checklist.length}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                      <div 
+                        className="bg-ibm-blue h-1.5 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${Math.round((Object.values(item.progress || {}).filter(Boolean).length / item.metadata.checklist.length) * 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-1.5">
+                  {item.metadata.tech_stack?.slice(0, 3).map((tech, i) => (
+                    <span key={i} className="text-xs font-medium bg-blue-50 text-ibm-blue px-2 py-1 rounded-md">
+                      {tech}
+                    </span>
+                  ))}
+                  {item.metadata.tech_stack && item.metadata.tech_stack.length > 3 && (
+                    <span className="text-xs font-medium bg-gray-50 text-gray-400 px-2 py-1 rounded-md">
+                      +{item.metadata.tech_stack.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {history.length > 3 && (
+            <div className="mt-8 text-center">
+              <button 
+                onClick={() => setIsShowingAll(true)}
+                className="px-6 py-2.5 bg-white border border-gray-200 shadow-sm text-ibm-gray font-medium rounded-xl hover:border-ibm-blue hover:text-ibm-blue transition-colors inline-flex items-center gap-2"
+              >
+                See all repositories
+                <span className="bg-gray-100 text-gray-600 text-xs py-0.5 px-2 rounded-full font-bold">
+                  {history.length}
+                </span>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
