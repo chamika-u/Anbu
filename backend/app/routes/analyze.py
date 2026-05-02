@@ -371,30 +371,13 @@ def analyze_repository():
             'checklist':          checklist,
         }
 
-        # Save to database
-        try:
-            user = get_optional_user()
-            analysis_record = RepositoryAnalysis(
-                repo_url=repo_url,
-                owner=owner,
-                repo_name=repo,
-                documentation=documentation,
-                metadata_json=json.dumps(metadata),
-                user_id=user.id if user else None
-            )
-            db.session.add(analysis_record)
-            db.session.commit()
-            print(f"[Analyze] Saved analysis to database with ID: {analysis_record.id}")
-            metadata['id'] = analysis_record.id
-        except Exception as db_err:
-            print(f"[Analyze] Database save error: {db_err}")
-            db.session.rollback()
-
+        # No automatic saving. Wait for user to manually save via history API.
+        
         return jsonify({
-            'success':       True,
+            'success': True,
             'documentation': documentation,
-            'metadata':      metadata,
-            'share_url':     f'https://github.com/{owner}/{repo}',
+            'metadata': metadata,
+            'share_url': f"https://github.com/{owner}/{repo}",
             'using_watsonx': ai_generated,
         }), 200
 

@@ -1,11 +1,11 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.models.analysis import RepositoryAnalysis
 from app.routes.auth import require_auth
 from app import db
 
 bp = Blueprint('history', __name__, url_prefix='/api/history')
 
-@bp.route('/', methods=['GET'])
+@bp.route('', methods=['GET'])
 @require_auth
 def get_history(user):
     """Get all previously generated repository documentations for the logged-in user."""
@@ -56,5 +56,42 @@ def update_progress(user, analysis_id):
         return jsonify({'success': True}), 200
     except Exception as e:
         print(f"[History] Error updating progress {analysis_id}: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/save', methods=['POST'])
+@require_auth
+def save_analysis(user):
+    """Manually save an analysis to the dashboard."""
+    try:
+        data = request.get_json()
+        repo_url = data.get('repo_url')
+        owner = data.get('owner')
+        repo_name = data.get('repo_name')
+        documentation = data.get('documentation')
+        metadata = data.get('metadata')
+        
+        if not all([repo_url, owner, repo_name, documentation, metadata]):
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+            
+        import json
+        analysis_record = RepositoryAnalysis(
+            repo_url=repo_url,
+            owner=owner,
+            repo_name=repo_name,
+            documentation=documentation,
+            metadata_json=json.dumps(metadata),
+            user_id=user.id,
+            progress_json="{}"
+        )
+        db.session.add(analysis_record)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'id': analysis_record.id
+        }), 201
+    except Exception as e:
+        print(f"[History] Error saving analysis: {e}")
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500

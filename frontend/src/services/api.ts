@@ -245,6 +245,25 @@ export const updateProgress = async (analysisId: number, progress: Record<string
   }
 };
 
+/** Save a newly generated analysis to the dashboard */
+export const saveAnalysis = async (repoUrl: string, owner: string, repoName: string, documentation: string, metadata: RepoMetadata): Promise<{ id: number }> => {
+  try {
+    const response = await api.post('/api/history/save', {
+      repo_url: repoUrl,
+      owner,
+      repo_name: repoName,
+      documentation,
+      metadata
+    });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to save analysis');
+    }
+    return { id: response.data.id };
+  } catch (error) {
+    throw new Error(extractErrorMessage(error, 'Failed to save analysis'), { cause: error });
+  }
+};
+
 export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await api.post<AuthResponse>('/api/auth/login', { email, password });
