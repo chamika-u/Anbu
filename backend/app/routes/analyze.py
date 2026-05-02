@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response, stream_with_context
 from app.services.watsonx_service import get_watsonx_service
 import requests
 import re
@@ -311,7 +311,7 @@ def generate_deterministic_checklist(repo_info: dict) -> list:
 
 @bp.route('/analyze', methods=['POST'])
 def analyze_repository():
-    """Analyse a GitHub repository and return onboarding documentation."""
+    """Analyse a GitHub repository and return onboarding documentation via SSE."""
     try:
         data = request.get_json(silent=True)
         if not data:
@@ -329,57 +329,72 @@ def analyze_repository():
                 'error': 'Invalid GitHub URL. Expected format: https://github.com/owner/repo',
             }), 400
 
-        # Fetch data from GitHub
-        print(f"[Analyze] Fetching data for {owner}/{repo}…")
-        repo_info, fetch_error = fetch_github_repo_data(owner, repo)
-        if fetch_error:
-            return jsonify({'success': False, 'error': fetch_error}), 400
+        def generate():
+            try:
+                yield f"data: {json.dumps({'status': 'progress', 'message': f'Connecting to GitHub to fetch {owner}/{repo}...'})}\n\n"
+                print(f"[Analyze] Fetching data for {owner}/{repo}…")
+                repo_info, fetch_error = fetch_github_repo_data(owner, repo)
+                if fetch_error:
+                    yield f"data: {json.dumps({'status': 'error', 'error': fetch_error})}\n\n"
+                    return
 
-        # Try AI generation
-        watsonx_service = get_watsonx_service()
-        ai_generated = False
-        documentation = ''
+                yield f"data: {json.dumps({'status': 'progress', 'message': 'Analysing project structure and dependencies...'})}\n\n"
 
-        if watsonx_service.is_available():
-            print("[Analyze] WatsonX is configured — generating AI documentation…")
-            prompt = build_prompt(repo_info, owner, repo)
-            wx_response = watsonx_service.generate_documentation(prompt)
+                # Try AI generation
+                watsonx_service = get_watsonx_service()
+                ai_generated = False
+                documentation = ''
 
-            if wx_response.get('success') and wx_response.get('content'):
-                documentation = wx_response['content']
-                ai_generated = True
-                print(f"[Analyze] ✓ AI documentation generated ({len(documentation)} chars)")
-            else:
-                # WatsonX call failed at runtime — fall back gracefully
-                wx_error = wx_response.get('error', 'Unknown WatsonX error')
-                print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback template")
-                documentation = build_fallback_documentation(owner, repo, repo_info)
-        else:
-            print("[Analyze] WatsonX not configured — using fallback template")
-            documentation = build_fallback_documentation(owner, repo, repo_info)
+                if watsonx_service.is_available():
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation with IBM watsonx AI...'})}\n\n"
+                    print("[Analyze] WatsonX is configured — generating AI documentation…")
+                    prompt = build_prompt(repo_info, owner, repo)
+                    wx_response = watsonx_service.generate_documentation(prompt)
 
-        # Generate Checklist
-        checklist = generate_deterministic_checklist(repo_info)
+                    if wx_response.get('success') and wx_response.get('content'):
+                        documentation = wx_response['content']
+                        ai_generated = True
+                        print(f"[Analyze] ✓ AI documentation generated ({len(documentation)} chars)")
+                    else:
+                        # WatsonX call failed at runtime — fall back gracefully
+                        wx_error = wx_response.get('error', 'Unknown WatsonX error')
+                        print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback template")
+                        yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using fallback template...'})}\n\n"
+                        documentation = build_fallback_documentation(owner, repo, repo_info)
+                else:
+                    print("[Analyze] WatsonX not configured — using fallback template")
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation from template...'})}\n\n"
+                    documentation = build_fallback_documentation(owner, repo, repo_info)
 
-        metadata = {
-            'repo_name':          repo,
-            'owner':              owner,
-            'tech_stack':         repo_info.get('languages', []),
-            'dependencies_count': len(repo_info.get('tree', [])),
-            'generated_at':       datetime.utcnow().isoformat() + 'Z',
-            'ai_generated':       ai_generated,
-            'checklist':          checklist,
-        }
+                yield f"data: {json.dumps({'status': 'progress', 'message': 'Finalising documentation and checklist...'})}\n\n"
+                # Generate Checklist
+                checklist = generate_deterministic_checklist(repo_info)
 
-        # No automatic saving. Wait for user to manually save via history API.
-        
-        return jsonify({
-            'success': True,
-            'documentation': documentation,
-            'metadata': metadata,
-            'share_url': f"https://github.com/{owner}/{repo}",
-            'using_watsonx': ai_generated,
-        }), 200
+                metadata = {
+                    'repo_name':          repo,
+                    'owner':              owner,
+                    'tech_stack':         repo_info.get('languages', []),
+                    'dependencies_count': len(repo_info.get('tree', [])),
+                    'generated_at':       datetime.utcnow().isoformat() + 'Z',
+                    'ai_generated':       ai_generated,
+                    'checklist':          checklist,
+                }
+
+                result = {
+                    'success': True,
+                    'documentation': documentation,
+                    'metadata': metadata,
+                    'share_url': f"https://github.com/{owner}/{repo}",
+                    'using_watsonx': ai_generated,
+                }
+                
+                yield f"data: {json.dumps({'status': 'complete', 'result': result})}\n\n"
+
+            except Exception as e:
+                print(f"[Analyze] Unhandled exception in generator: {e}")
+                yield f"data: {json.dumps({'status': 'error', 'error': f'Internal server error: {e}'})}\n\n"
+
+        return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
     except Exception as e:
         print(f"[Analyze] Unhandled exception: {e}")

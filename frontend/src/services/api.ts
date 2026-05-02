@@ -124,24 +124,80 @@ function extractErrorMessage(error: unknown, fallback: string): string {
 // ── API functions ─────────────────────────────────────────────────────────────
 
 /** Analyze a GitHub repository and return generated documentation. */
-export const analyzeRepository = async (repoUrl: string): Promise<AnalyzeResponse> => {
+export const analyzeRepository = async (repoUrl: string, onProgress?: (msg: string) => void): Promise<AnalyzeResponse> => {
+  const token = localStorage.getItem('anbu_token');
   try {
-    const response = await api.post<AnalyzeResponse>('/api/analyze', { repo_url: repoUrl });
-    const data = response.data;
+    const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ repo_url: repoUrl })
+    });
 
-    // The backend can return success:true OR success:false with a 200 status.
-    // Normalise both cases so callers only deal with one path.
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to generate documentation');
+    if (!response.ok) {
+      let errorMsg = 'Failed to analyze repository';
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorData.message || errorMsg;
+      } catch (e) {
+        // Not JSON
+      }
+      throw new Error(errorMsg);
     }
 
-    return data;
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error('No response stream');
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let result: AnalyzeResponse | null = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n\n');
+      buffer = lines.pop() || ''; // Keep the last incomplete part in the buffer
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.status === 'progress' && onProgress) {
+              onProgress(data.message);
+            } else if (data.status === 'complete') {
+              result = data.result;
+            } else if (data.status === 'error') {
+              throw new Error(data.error);
+            }
+          } catch (e) {
+            // Check if it's a JSON parse error or our custom error
+            if (e instanceof Error && !e.message.includes('JSON')) {
+              throw e;
+            }
+            console.error('Error parsing SSE data', e, 'Line was:', line);
+          }
+        }
+      }
+    }
+
+    if (!result) {
+      throw new Error('Server closed connection before completing analysis');
+    }
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to generate documentation');
+    }
+
+    return result;
   } catch (error) {
-    if (error instanceof AxiosError) {
-      throw new Error(extractErrorMessage(error, 'Failed to analyze repository'), { cause: error });
+    if (error instanceof Error) {
+      throw error;
     }
-    // Re-throw normalised Error objects (from the !data.success branch above)
-    throw error instanceof Error ? error : new Error(String(error), { cause: error });
+    throw new Error(String(error));
   }
 };
 
