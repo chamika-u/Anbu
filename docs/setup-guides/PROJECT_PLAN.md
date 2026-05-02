@@ -1,4 +1,4 @@
-# 📅 Anbu - Project Implementation Plan
+# Anbu - Project Implementation Plan
 
 **Project**: Anbu - AI-Powered Developer Onboarding Platform  
 **Hackathon**: IBM Bob Hackathon 2026  
@@ -11,12 +11,12 @@
 
 | Milestone | Deadline | Status |
 |-----------|----------|--------|
-| Project Setup Complete | May 1, 10:00 PM | ⏳ Pending |
-| Backend Core Ready | May 2, 1:00 PM | ⏳ Pending |
-| Frontend Complete | May 2, 6:00 PM | ⏳ Pending |
-| Testing Done | May 2, 10:00 PM | ⏳ Pending |
-| Deployment Complete | May 3, 2:00 PM | ⏳ Pending |
-| **Final Submission** | **May 3, 7:30 PM** | ⏳ **CRITICAL** |
+| Project Setup Complete | May 1, 10:00 PM | Pending |
+| Backend Core Ready | May 2, 1:00 PM | Pending |
+| Frontend Complete | May 2, 6:00 PM | Pending |
+| Testing Done | May 2, 10:00 PM | Pending |
+| Deployment Complete | May 3, 2:00 PM | Pending |
+| **Final Submission** | **May 3, 7:30 PM** | **CRITICAL** |
 
 ---
 
@@ -340,7 +340,7 @@ Buffer: 2 hours for unexpected issues
 - [ ] Create demo materials
 - [ ] Final testing
 - [ ] Submit project
-- [ ] Celebrate! 🎉
+- [ ] Celebrate!
 
 ---
 
@@ -444,13 +444,13 @@ vercel --prod
 - [ ] **SUBMIT PROJECT**
 - [ ] Verify submission received
 - [ ] Take screenshots of submission
-- [ ] Celebrate! 🎊
+- [ ] Celebrate!
 
 ---
 
 **Remember**: Done is better than perfect. Focus on working demo with clear watsonx AI integration!
 
-**You've got this! 💪🚀**
+**You've got this!**
 
 ---
 
