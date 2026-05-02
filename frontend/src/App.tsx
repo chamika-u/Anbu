@@ -331,44 +331,20 @@ function App() {
         )}
 
         {result?.documentation && (
-          <div className="fade-in">
-            <div className="mb-6 flex flex-wrap justify-between items-center gap-4">
-              <h2 className="text-2xl font-bold text-ibm-gray">Generated Documentation</h2>
-              <div className="flex gap-3">
-                {user && !(result.metadata as any).id && (
-                  <button
-                    onClick={handleSaveToDashboard}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 px-4 py-2 bg-ibm-teal text-white rounded-lg font-medium hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-70"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    {isSaving ? 'Saving...' : 'Save to Dashboard'}
-                  </button>
-                )}
-                <button
-                  onClick={handleReset}
-                  className="flex items-center gap-2 px-4 py-2 text-ibm-blue hover:bg-blue-50 border border-ibm-blue rounded-lg font-medium transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  {user ? 'Back to Dashboard' : 'Analyse Another Repository'}
-                </button>
-              </div>
-            </div>
-            <DocumentationViewer
-              documentation={result.documentation}
-              metadata={result.metadata}
-              shareUrl={result.share_url}
-              onDownload={handleDownload}
-              onDownloadPdf={handleDownloadPdf}
-              onCopyShareUrl={handleCopyShareUrl}
-              onProgressChange={handleProgressChange}
-            />
-          </div>
+          <DocumentationViewer
+            documentation={result.documentation}
+            metadata={result.metadata}
+            shareUrl={result.share_url}
+            onDownload={handleDownload}
+            onDownloadPdf={handleDownloadPdf}
+            onCopyShareUrl={handleCopyShareUrl}
+            onProgressChange={handleProgressChange}
+            onBack={handleReset}
+            onSave={user && !(result.metadata as any).id ? handleSaveToDashboard : undefined}
+            isSaving={isSaving}
+          />
         )}
+
 
       </main>
 
