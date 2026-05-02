@@ -13,7 +13,7 @@ class DefaultAIService:
         if not tree:
             return "graph LR\n    A[Repository] --> B[Empty]"
             
-        lines = ["graph LR", f'    Root["📦 {repo_name}"]']
+        lines = ["graph LR", f'    Root["{repo_name}"]']
         lines.append('    style Root fill:#161616,color:#ffffff,stroke:#161616,stroke-width:2px,rx:10,ry:10')
         
         ignore_dirs = {'node_modules', 'venv', '.git', '.github', 'dist', 'build', '__pycache__', '.next'}
@@ -51,10 +51,10 @@ class DefaultAIService:
             added_nodes[path] = node_id
             
             if is_dir:
-                lines.append(f'    {parent_id} --> {node_id}["📁 {name}"]')
+                lines.append(f'    {parent_id} --> {node_id}["{name}"]')
                 lines.append(f'    style {node_id} fill:#f0f4ff,stroke:#0f62fe,stroke-width:2px')
             else:
-                lines.append(f'    {parent_id} --> {node_id}["📄 {name}"]')
+                lines.append(f'    {parent_id} --> {node_id}["{name}"]')
                 lines.append(f'    style {node_id} fill:#ffffff,stroke:#8d8d8d,stroke-width:1px')
                 
             node_count += 1
