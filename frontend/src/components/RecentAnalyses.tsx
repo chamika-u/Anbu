@@ -231,14 +231,17 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                 onClick={() => onSelect(item)}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group relative"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors pr-8">
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors pr-6">
                     {item.repo_name}
                   </h4>
-                  <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full whitespace-nowrap uppercase tracking-tighter">
+                      {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
                     <button 
                       onClick={(e) => handleDelete(e, item.id)}
-                      className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all"
+                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-all -mr-1"
                       title="Delete analysis"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,12 +249,9 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                       </svg>
                     </button>
                   </div>
-                  <span className="text-xs font-medium bg-gray-100 text-gray-500 px-2 py-1 rounded-full whitespace-nowrap">
-                    {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                  </span>
                 </div>
                 
-                <p className="text-sm text-gray-500 mb-4 truncate">
+                <p className="text-xs text-gray-400 mb-4 truncate">
                   {item.owner}/{item.repo_name}
                 </p>
 
