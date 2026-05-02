@@ -85,48 +85,48 @@ Each Bob task includes:
 
 #### Task 1: PostgreSQL Migration
 • Description: Migrated the application from local file storage to a professional PostgreSQL database.
-• Summary Screenshot: bob_sessions/task-01_summary.png
-• Exported History: bob_sessions/task-01_history.md
+• Summary Screenshot: [bob_sessions/task-01_summary.png](./bob_sessions/task-01_summary.png)
+• Exported History: [bob_sessions/task-01_history.md](./bob_sessions/task-01_history.md)
 
 #### Task 2: Architecture Running
 • Description: Verified the project architecture and service connectivity using Docker.
-• Summary Screenshot: bob_sessions/task-02_summary.png
-• Exported History: bob_sessions/task-02_history.md
+• Summary Screenshot: [bob_sessions/task-02_summary.png](./bob_sessions/task-02_summary.png)
+• Exported History: [bob_sessions/task-02_history.md](./bob_sessions/task-02_history.md)
 
 #### Task 3: Onboarding Dashboard
 • Description: Developed the user-linked progress tracking and history dashboard.
-• Summary Screenshot: bob_sessions/task-03_summary.png
-• Exported History: bob_sessions/task-03_history.md
+• Summary Screenshot: [bob_sessions/task-03_summary.png](./bob_sessions/task-03_summary.png)
+• Exported History: [bob_sessions/task-03_history.md](./bob_sessions/task-03_history.md)
 
 #### Task 4: Real-Time Sync
 • Description: Implemented bi-directional synchronization between the UI and database.
-• Summary Screenshot: bob_sessions/task-04_summary.png
-• Exported History: bob_sessions/task-04_history.md
+• Summary Screenshot: [bob_sessions/task-04_summary.png](./bob_sessions/task-04_summary.png)
+• Exported History: [bob_sessions/task-04_history.md](./bob_sessions/task-04_history.md)
 
 #### Task 5: watsonx Service
 • Description: Integrated IBM watsonx AI SDK and implemented fallback AI services.
-• Summary Screenshot: bob_sessions/task-05_summary.png
-• Exported History: bob_sessions/task-05_history.md
+• Summary Screenshot: [bob_sessions/task-05_summary.png](./bob_sessions/task-05_summary.png)
+• Exported History: [bob_sessions/task-05_history.md](./bob_sessions/task-05_history.md)
 
 #### Task 6: Documentation Refactor
 • Description: Cleaned up and professionalized all repository documentation.
-• Summary Screenshot: bob_sessions/task-06_summary.png
-• Exported History: bob_sessions/task-06_history.md
+• Summary Screenshot: [bob_sessions/task-06_summary.png](./bob_sessions/task-06_summary.png)
+• Exported History: [bob_sessions/task-06_history.md](./bob_sessions/task-06_history.md)
 
 #### Task 7: Deployment Configuration
 • Description: Optimized Docker settings and environment variable handling.
-• Summary Screenshot: bob_sessions/task-07_summary.png
-• Exported History: bob_sessions/task-07_history.md
+• Summary Screenshot: [bob_sessions/task-07_summary.png](./bob_sessions/task-07_summary.png)
+• Exported History: [bob_sessions/task-07_history.md](./bob_sessions/task-07_history.md)
 
 #### Task 8: Service Validation
 • Description: Conducted end-to-end testing of the analysis and generation pipeline.
-• Summary Screenshot: bob_sessions/task-08_summary.png
-• Exported History: bob_sessions/task-08_history.md
+• Summary Screenshot: [bob_sessions/task-08_summary.png](./bob_sessions/task-08_summary.png)
+• Exported History: [bob_sessions/task-08_history.md](./bob_sessions/task-08_history.md)
 
 #### Task 9: Final Submission Report
 • Description: Consolidated all project metrics and created the final hackathon report.
-• Summary Screenshot: bob_sessions/task-09_summary.png
-• Exported History: bob_sessions/task-09_history.md
+• Summary Screenshot: [bob_sessions/task-09_summary.png](./bob_sessions/task-09_summary.png)
+• Exported History: [bob_sessions/task-09_history.md](./bob_sessions/task-09_history.md)
 
 ---
 
