@@ -12,7 +12,6 @@ const EXAMPLE_REPOS = [
   'https://github.com/django/django',
 ];
 
-/** Pattern: https://github.com/owner/repo or http variant, optional trailing slash */
 const GITHUB_URL_PATTERN = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/;
 
 const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, hasGitHubToken = false }) => {
@@ -22,14 +21,9 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
   const validate = (url: string): string => {
     if (!url.trim()) return 'Please enter a GitHub repository URL.';
     if (!GITHUB_URL_PATTERN.test(url.trim())) {
-      return 'Please enter a valid GitHub repository URL (e.g. https://github.com/username/repo).';
+      return 'Please enter a valid GitHub repository URL.';
     }
     return '';
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRepoUrl(e.target.value);
-    if (validationError) setValidationError('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -43,166 +37,116 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
     onSubmit(repoUrl.trim());
   };
 
-  const handleExampleClick = (url: string) => {
-    setRepoUrl(url);
-    setValidationError('');
-  };
-
-  const hasError = Boolean(validationError);
-
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div>
-          <label
-            htmlFor="repo-url"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            GitHub Repository URL
-          </label>
-
-          <div className="flex gap-2">
-            <input
-              id="repo-url"
-              type="url"
-              value={repoUrl}
-              onChange={handleChange}
-              placeholder="https://github.com/username/repository"
-              aria-invalid={hasError}
-              aria-describedby={hasError ? 'repo-url-error' : undefined}
-              className={[
-                'flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-shadow text-sm',
-                hasError
-                  ? 'border-red-400 focus:ring-red-400 bg-red-50'
-                  : 'border-gray-300 focus:ring-ibm-blue focus:border-ibm-blue bg-white',
-                isLoading ? 'opacity-60 cursor-not-allowed' : '',
-              ].join(' ')}
-              disabled={isLoading}
-              autoComplete="url"
-            />
-
-            <button
-              type="submit"
-              id="analyze-btn"
-              disabled={isLoading}
-              className={[
-                'px-7 py-3 rounded-xl font-semibold text-white text-sm transition-all whitespace-nowrap',
-                isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-ibm-blue hover:bg-blue-700 active:scale-95 hover:shadow-lg',
-              ].join(' ')}
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Analysing…
+    <div className="w-full max-w-3xl mx-auto fade-in">
+      <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 p-8 md:p-12 border border-slate-100">
+        <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label htmlFor="repo-url" className="text-sm font-bold text-slate-900 uppercase tracking-widest">
+                Repository Analysis
+              </label>
+              {hasGitHubToken ? (
+                <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  Private Enabled
                 </span>
               ) : (
-                'Generate Docs'
+                <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md">
+                  Public Only
+                </span>
               )}
-            </button>
-          </div>
+            </div>
 
-          {/* Inline validation error */}
-          {hasError && (
-            <p
-              id="repo-url-error"
-              className="mt-2 text-sm text-red-600 flex items-center gap-1"
-              role="alert"
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {validationError}
-            </p>
-          )}
-
-          {/* Private repo access indicator */}
-          {hasGitHubToken ? (
-            <p className="mt-2 text-xs text-green-600 flex items-center gap-1.5 font-medium">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Private repository access enabled
-            </p>
-          ) : (
-            <p className="mt-2 text-xs text-gray-400 flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-              </svg>
-              Only public repositories supported. Log in and add a GitHub token for private repos.
-            </p>
-          )}
-        </div>
-
-        {/* Example repositories */}
-        <div className="pt-1">
-          <p className="text-sm text-gray-500 mb-2">Try an example:</p>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLE_REPOS.map((url) => (
-              <button
-                key={url}
-                type="button"
-                onClick={() => handleExampleClick(url)}
+            <div className="relative group">
+              <input
+                id="repo-url"
+                type="url"
+                value={repoUrl}
+                onChange={(e) => { setRepoUrl(e.target.value); setValidationError(''); }}
+                placeholder="https://github.com/owner/repository"
+                className={`w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl text-lg font-medium transition-all placeholder:text-slate-300 outline-none ${
+                  validationError 
+                    ? 'border-red-100 focus:border-red-200 focus:bg-red-50 text-red-900' 
+                    : 'border-transparent focus:border-ibm-blue/20 focus:bg-white text-slate-900 focus:shadow-inner'
+                } ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
                 disabled={isLoading}
-                className="px-3 py-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 px-8 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 disabled:bg-slate-300 disabled:shadow-none ${
+                  isLoading ? 'pr-12' : ''
+                }`}
               >
-                {url.split('/').slice(-2).join('/')}
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span>Analyzing</span>
+                  </div>
+                ) : 'Analyze'}
               </button>
-            ))}
-          </div>
-        </div>
-      </form>
+            </div>
 
-      {/* Info panel */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-        <div className="flex items-start gap-3">
-          <svg
-            className="w-5 h-5 text-ibm-blue mt-0.5 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="text-sm text-gray-700">
-            <p className="font-semibold mb-1">How it works</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-600">
-              <li>Paste any public GitHub repository URL above</li>
-              <li>Log in and add a GitHub token to access <strong>private repos</strong></li>
-              <li>Our AI analyses the codebase structure and dependencies</li>
-              <li>Get comprehensive onboarding documentation in minutes</li>
-              <li>Download as Markdown or share with your team</li>
-            </ul>
+            {validationError && (
+              <p className="text-xs font-bold text-red-500 uppercase tracking-widest pl-2">
+                {validationError}
+              </p>
+            )}
           </div>
+
+          <div className="pt-4 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quick Start</span>
+              {EXAMPLE_REPOS.map((url) => (
+                <button
+                  key={url}
+                  type="button"
+                  onClick={() => { setRepoUrl(url); setValidationError(''); }}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 text-[11px] font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 active:scale-95 transition-all"
+                >
+                  {url.split('/').pop()}
+                </button>
+              ))}
+            </div>
+            
+            {!hasGitHubToken && (
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-slate-300 rounded-full" />
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Private repos require login
+                </span>
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 bg-white/50 rounded-2xl border border-white/50 backdrop-blur-sm">
+          <div className="w-8 h-8 bg-blue-50 text-ibm-blue rounded-lg flex items-center justify-center mb-4">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">Architecture</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">AI-powered system design visualization using Mermaid diagrams.</p>
+        </div>
+        <div className="p-6 bg-white/50 rounded-2xl border border-white/50 backdrop-blur-sm">
+          <div className="w-8 h-8 bg-emerald-50 text-ibm-teal rounded-lg flex items-center justify-center mb-4">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">Real-time</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">Live analysis progress tracking via Server-Sent Events (SSE).</p>
+        </div>
+        <div className="p-6 bg-white/50 rounded-2xl border border-white/50 backdrop-blur-sm">
+          <div className="w-8 h-8 bg-purple-50 text-ibm-purple rounded-lg flex items-center justify-center mb-4">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </div>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">Exportable</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">Save to your dashboard or export as high-quality PDF/Markdown.</p>
         </div>
       </div>
     </div>
@@ -210,3 +154,4 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
 };
 
 export default RepositoryInput;
+
