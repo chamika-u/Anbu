@@ -98,7 +98,12 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
 
       {/* ── Interactive Checklist ───────────────────────────────────────── */}
       {metadata?.checklist && metadata.checklist.length > 0 && (
-        <OnboardingChecklist repoName={metadata.repo_name} tasks={metadata.checklist} />
+        <OnboardingChecklist 
+          repoName={metadata.repo_name} 
+          tasks={metadata.checklist} 
+          analysisId={(metadata as any).id}
+          initialProgress={(metadata as any).progress}
+        />
       )}
 
       {/* ── View tabs ────────────────────────────────────────────────────── */}
