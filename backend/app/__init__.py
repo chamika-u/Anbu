@@ -32,9 +32,20 @@ def create_app():
     app.register_blueprint(history.bp)
     app.register_blueprint(auth.bp)
     
-    # Create database tables
+    # Create database tables with retry logic
     with app.app_context():
-        db.create_all()
+        import time
+        for i in range(10):
+            try:
+                db.create_all()
+                print("Database tables initialized successfully.")
+                break
+            except Exception as e:
+                print(f"Database connection attempt {i+1} failed: {e}")
+                if i < 9:
+                    time.sleep(2)
+                else:
+                    raise e
     
     return app
 
