@@ -50,18 +50,18 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 - **🔗 Public Repository Support** - Paste any GitHub URL to analyze
 - **🤖 AI-Powered Analysis** - IBM watsonx AI understands code structure and patterns
 - **📝 Comprehensive Documentation** - Generates beginner-friendly, actionable guides
-- **👀 Instant Preview** - View documentation in browser before downloading
-- **💾 Download as Markdown** - Save documentation locally for offline access
-- **☁️ Cloud Storage** - Documents stored persistently in IBM Cloud Object Storage
-- **🔗 Shareable Links** - Generate unique URLs to share with team members
-- **⚡ Real-time Progress** - Live status updates during analysis
+- **💾 Persistent Dashboard** - Save your generated documentation to a personal dashboard
+- **🔄 Progress Tracking** - Keep track of your onboarding progress natively within the app
+- **⚡ Real-time Updates** - Live, repository-specific Server-Sent Events (SSE) progress updates during analysis
+- **👀 Instant Preview & Export** - View documentation in browser or download as Markdown/PDF
+- **🔐 User Authentication** - Secure login and registration for personalized experiences
 
 ### Technical Highlights
 
-- **Multi-Language Support** - JavaScript, Python, Java, Go, Ruby, and more
-- **Smart Tech Stack Detection** - Automatically identifies frameworks and dependencies
-- **Intelligent File Analysis** - Focuses on most important files and patterns
-- **Error Handling** - Graceful handling of edge cases and API limits
+- **Multi-Language Support** - JavaScript, TypeScript, Python, Java, Go, Ruby, and more
+- **Smart Tech Stack Detection** - Automatically identifies frameworks, containerization, and dependencies
+- **Dynamic SSE Streaming** - Backend analyzes repository contents and streams specific loading statuses (e.g. "Analysing frontend components")
+- **Robust PostgreSQL Backend** - Scalable, relational data storage instead of file-based persistence
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
 
 ---
@@ -77,9 +77,10 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 
 ### Backend
 - **Flask** (Python) - Lightweight web framework
+- **PostgreSQL** - Robust relational database for users, documentation, and progress states
 - **IBM watsonx AI SDK** - Access to powerful foundation models
 - **PyGithub** - GitHub API integration for repository access
-- **IBM Cloud Object Storage SDK** - Persistent document storage
+- **Server-Sent Events (SSE)** - Real-time streaming for progress tracking
 
 ### IBM Cloud Services
 - **IBM watsonx AI** - Core AI capabilities for code analysis and documentation generation
@@ -114,20 +115,16 @@ Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository
 - Documentation preview
 - Download functionality
 
-✅ **Cloud Integration**
-- Persistent document storage
-- Shareable documentation URLs
-- Scalable infrastructure
+✅ **Cloud Integration & Persistence**
+- PostgreSQL database integration
+- Persistent, user-specific dashboard
+- Interactive progress state synchronization
 
 ### Out of Scope (Future Enhancements)
 
 ❌ **Private Repository Support** - Requires OAuth implementation
-❌ **Multiple Output Formats** - PDF, HTML, DOCX generation
-❌ **User Authentication** - Account management and history
 ❌ **Team Collaboration** - Shared workspaces and comments
 ❌ **Version Control** - Track documentation changes over time
-❌ **Custom Templates** - User-defined documentation structures
-❌ **API Access** - Programmatic documentation generation
 ❌ **Analytics Dashboard** - Usage metrics and insights
 
 ---
@@ -251,9 +248,11 @@ COS_BUCKET_NAME=anbu-docs
 # GitHub (Optional)
 GITHUB_TOKEN=your_github_personal_access_token
 
-# Flask
+# Flask & Database
 FLASK_ENV=development
 FLASK_DEBUG=True
+DATABASE_URL=postgresql://user:password@localhost:5432/anbu
+SECRET_KEY=your_secret_key
 ```
 
 #### Frontend (.env)
