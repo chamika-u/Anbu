@@ -39,6 +39,16 @@ def create_app():
             try:
                 db.create_all()
                 print("Database tables initialized successfully.")
+                # Idempotent migration: add github_token column to users if missing
+                try:
+                    db.session.execute(db.text(
+                        "ALTER TABLE users ADD COLUMN IF NOT EXISTS github_token VARCHAR(255)"
+                    ))
+                    db.session.commit()
+                    print("Migration: github_token column ensured on users table.")
+                except Exception as migration_err:
+                    db.session.rollback()
+                    print(f"Migration note: {migration_err}")
                 break
             except Exception as e:
                 print(f"Database connection attempt {i+1} failed: {e}")
@@ -46,6 +56,7 @@ def create_app():
                     time.sleep(2)
                 else:
                     raise e
+
     
     return app
 

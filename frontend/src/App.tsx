@@ -8,6 +8,7 @@ import DocumentationViewer from './components/DocumentationViewer';
 import Toast from './components/Toast';
 import RecentAnalyses from './components/RecentAnalyses';
 import AuthPage from './components/AuthPage';
+import GitHubTokenManager from './components/GitHubTokenManager';
 import { analyzeRepository, saveAnalysis, type AnalyzeResponse, type RepoMetadata, type HistoryAnalysis } from './services/api';
 import { useAuth } from './context/AuthContext';
 // @ts-ignore
@@ -35,7 +36,7 @@ function App() {
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0]);
   const [toast, setToast] = useState<ToastState | null>(null);
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, updateUser } = useAuth();
 
   const showToast = useCallback((message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type });
@@ -279,9 +280,13 @@ function App() {
             !user ? <Navigate to="/login" /> : (
               !result && !isLoading ? (
                 <>
-                  <div className="fade-in mb-12">
-                    <h2 className="text-3xl font-bold text-ibm-gray mb-4">Your Dashboard</h2>
-                    <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} />
+                  <div className="fade-in mb-6">
+                    <h2 className="text-3xl font-bold text-ibm-gray mb-6">Your Dashboard</h2>
+                    <GitHubTokenManager
+                      hasToken={user.has_github_token ?? false}
+                      onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
+                    />
+                    <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} hasGitHubToken={user.has_github_token ?? false} />
                   </div>
                   <RecentAnalyses onSelect={handleSelectHistory} />
                 </>
