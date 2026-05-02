@@ -1,6 +1,24 @@
-import os, sys
+"""
+Standalone WatsonX connectivity diagnostic.
+NOT a pytest test — run directly:
+
+    python tests/backend/test_watsonx.py
+
+from the project root (e:\\Anbu\\).
+"""
+import os
+import sys
+
+# Resolve paths relative to project root regardless of CWD
+_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_backend = os.path.join(_root, 'backend')
+_env_file = os.path.join(_backend, '.env')
+
+# Add backend to path so app imports work if needed
+sys.path.insert(0, _backend)
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path=_env_file)
 
 api_key   = os.getenv('IBM_WATSONX_API_KEY')
 project_id = os.getenv('IBM_WATSONX_PROJECT_ID')
