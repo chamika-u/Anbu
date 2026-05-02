@@ -22,8 +22,8 @@ FROM nginx:stable-alpine
 # Copy the build output from the previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy a custom Nginx configuration if needed
-# For now, we'll use the default which serves on port 80
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
