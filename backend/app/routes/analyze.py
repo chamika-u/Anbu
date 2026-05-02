@@ -381,7 +381,7 @@ def analyze_repository():
                 documentation = ''
 
                 if watsonx_service.is_available():
-                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation with IBM watsonx AI...'})}\n\n"
+                    yield f"data: {json.dumps({'status': 'progress', 'message': f'Generating AI documentation for {repo} using IBM watsonx...'})}\n\n"
                     print("[Analyze] WatsonX is configured — generating AI documentation…")
                     prompt = build_prompt(repo_info, owner, repo)
                     wx_response = watsonx_service.generate_documentation(prompt)
