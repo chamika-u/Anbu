@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 from app.services.watsonx_service import get_watsonx_service
+from app.services.default_ai_service import get_default_ai_service
 import requests
 import re
 import json
@@ -157,123 +158,10 @@ Write the documentation in Markdown. Include the following sections:
 Make every section actionable, beginner-friendly, and use examples where helpful."""
 
 
-def generate_deterministic_mermaid(repo_name: str, tree: list) -> str:
-    """Generate a Mermaid diagram based on the actual repository root contents."""
-    if not tree:
-        return "graph LR\n    A[Repository] --> B[Empty]"
-        
-    lines = ["graph LR", f'    Root["📦 {repo_name}"]']
-    lines.append('    style Root fill:#161616,color:#ffffff,stroke:#161616,stroke-width:2px,rx:10,ry:10')
-    
-    ignore_dirs = {'node_modules', 'venv', '.git', '.github', 'dist', 'build', '__pycache__', '.next'}
-    
-    # Filter and sort paths
-    paths = []
-    for item in tree:
-        path = item.get('path', '')
-        parts = path.split('/')
-        if any(part in ignore_dirs or part.startswith('.') and len(part) > 1 for part in parts):
-            continue
-        paths.append((path, item.get('type') == 'tree'))
-        
-    # Process folders first, then files
-    paths.sort(key=lambda x: (not x[1], x[0].lower()))
-    
-    MAX_NODES = 40
-    node_count = 0
-    added_nodes = {'': 'Root'}
-    
-    for path, is_dir in paths:
-        if node_count >= MAX_NODES:
-            break
-            
-        parts = path.split('/')
-        parent_path = '/'.join(parts[:-1])
-        name = parts[-1]
-        
-        # If parent isn't in graph (e.g. skipped by limits), skip this
-        if parent_path not in added_nodes:
-            continue
-            
-        parent_id = added_nodes[parent_path]
-        node_id = f"node_{node_count}"
-        added_nodes[path] = node_id
-        
-        if is_dir:
-            lines.append(f'    {parent_id} --> {node_id}["📁 {name}"]')
-            lines.append(f'    style {node_id} fill:#f0f4ff,stroke:#0f62fe,stroke-width:2px')
-        else:
-            lines.append(f'    {parent_id} --> {node_id}["📄 {name}"]')
-            lines.append(f'    style {node_id} fill:#ffffff,stroke:#8d8d8d,stroke-width:1px')
-            
-        node_count += 1
-            
-    if len(paths) > MAX_NODES:
-        lines.append(f'    Root -.-> More["... and {len(paths) - MAX_NODES} more items hidden"]')
-        lines.append(f'    style More fill:#f4f4f4,stroke:#e0e0e0,stroke-dasharray: 5 5')
-    
-    return "\n".join(lines)
+# Mermaid generation is now handled by DefaultAIService
 
 
-def build_fallback_documentation(owner: str, repo: str, repo_info: dict) -> str:
-    """Return a plain template when WatsonX AI is unavailable."""
-    language  = repo_info.get('language', 'Unknown')
-    languages = repo_info.get('languages', [])
-    tech_stack = ', '.join(languages) if languages else language
-    description = repo_info.get('description') or 'No description provided'
-    
-    mermaid_code = generate_deterministic_mermaid(repo, repo_info.get('tree', []))
-
-    return f"""# {repo} — Developer Onboarding Guide
-
-> **Note:** This is an auto-generated template. Configure IBM watsonx AI credentials for a fully AI-generated guide.
-
-## Project Overview
-
-| Field | Value |
-|---|---|
-| Repository | `{owner}/{repo}` |
-| Description | {description} |
-| Primary Language | {language} |
-| Tech Stack | {tech_stack} |
-
-## Repository Architecture
-
-This is the live directory structure fetched directly from GitHub:
-
-```mermaid
-{mermaid_code}
-```
-
-## Getting Started
-
-### Prerequisites
-- Git installed on your machine
-- {language} development environment
-- Basic familiarity with {language}
-
-### Installation
-
-```bash
-git clone https://github.com/{owner}/{repo}.git
-cd {repo}
-```
-
-Then install dependencies and configure environment variables as described in the repository's own README.
-
-## Development Workflow
-
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes and write tests
-3. Commit with a clear message: `git commit -m "feat: add my feature"`
-4. Open a pull request for review
-
-## Resources
-
-- [Repository on GitHub](https://github.com/{owner}/{repo})
-- [GitHub Docs](https://docs.github.com)
-- [{language} Documentation](https://www.google.com/search?q={language}+documentation)
-"""
+# Fallback documentation is now handled by DefaultAIService
 
 
 def generate_deterministic_checklist(repo_info: dict) -> list:
@@ -377,6 +265,7 @@ def analyze_repository():
 
                 # Try AI generation
                 watsonx_service = get_watsonx_service()
+                default_service = get_default_ai_service()
                 ai_generated = False
                 documentation = ''
 
@@ -393,13 +282,17 @@ def analyze_repository():
                     else:
                         # WatsonX call failed at runtime — fall back gracefully
                         wx_error = wx_response.get('error', 'Unknown WatsonX error')
-                        print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback template")
-                        yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using fallback template...'})}\n\n"
-                        documentation = build_fallback_documentation(owner, repo, repo_info)
+                        print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback")
+                        yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using default code...'})}\n\n"
+                        # Use default service as fallback
+                        df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
+                        documentation = df_response['content']
                 else:
-                    print("[Analyze] WatsonX not configured — using fallback template")
-                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation from template...'})}\n\n"
-                    documentation = build_fallback_documentation(owner, repo, repo_info)
+                    print("[Analyze] WatsonX not configured — using default code")
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation using default code...'})}\n\n"
+                    # Use default service
+                    df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
+                    documentation = df_response['content']
 
                 yield f"data: {json.dumps({'status': 'progress', 'message': 'Finalising documentation and checklist...'})}\n\n"
                 # Generate Checklist
