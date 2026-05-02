@@ -1,6 +1,6 @@
 # IBM Bob Dev Day Hackathon – Submission Report
 
-*Team / Individual:* Chamika (Anbu Team)  
+*Team / Individual:* Chamika (SoftNox)  
 *Submission Date:* 2026-05-03
 
 ---
@@ -11,7 +11,7 @@
 Developer onboarding is a significant bottleneck in engineering teams. New hires often face undocumented or complex codebases, leading to a 2–4 week ramp-up period where they are unproductive. Senior developers are frequently pulled away from their work to explain basic architecture and setup, creating a resource drain across the organization.
 
 ### Solution
-**Anbu** (Tamil for "Love") is an AI-native platform that automates the generation of comprehensive onboarding guides for any GitHub repository. By leveraging **IBM watsonx.ai**, it provides a deep semantic understanding of the codebase, generating setup guides, tech stack breakdowns, and interactive checklists that reduce onboarding time from weeks to hours.
+**Anbu** is an AI-native platform that automates the generation of comprehensive onboarding guides for any GitHub repository. By leveraging **IBM watsonx.ai**, it provides a deep semantic understanding of the codebase, generating setup guides, tech stack breakdowns, and interactive checklists that reduce onboarding time from weeks to hours.
 
 ---
 
@@ -20,13 +20,21 @@ Developer onboarding is a significant bottleneck in engineering teams. New hires
 IBM Bob served as the lead developer and architect for the Anbu platform, handling both complex infrastructure migrations and frontend refinement.
 
 • *Task 1 – Backend Refactor:* Used Bob to migrate the persistence layer from JSON files to a robust PostgreSQL database.
+
 • *Task 2 – Architecture Verification:* Used Bob to verify and run the containerized architecture using Docker Compose.
+
 • *Task 3 – Dashboard Implementation:* Used Bob to build the personalized user dashboard and refactor UI error handling.
+
 • *Task 4 – Sync Logic:* Used Bob to implement real-time synchronization between the frontend checklist and the database.
+
 • *Task 5 – watsonx Integration:* Used Bob to establish the IBM watsonx AI service layer with intelligent fallback mechanisms.
+
 • *Task 6 – Documentation Cleanup:* Used Bob to professionalize the entire repository by standardizing Markdown and removing emojis.
+
 • *Task 7 – Deployment Orchestration:* Used Bob to configure Docker environments and prepare for IBM Code Engine deployment.
+
 • *Task 8 – QA & Validation:* Used Bob to perform deep testing of the analysis routes and watsonx integration.
+
 • *Task 9 – Submission Reporting:* Used Bob to generate this final submission report and consolidate task histories.
 
 ---
