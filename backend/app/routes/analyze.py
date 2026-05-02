@@ -270,6 +270,38 @@ Then install dependencies and configure environment variables as described in th
 """
 
 
+def generate_deterministic_checklist(repo_info: dict) -> list:
+    """Generate a dynamic checklist based on files found in the repository."""
+    tree = repo_info.get('tree', [])
+    # Extract just the filenames for quick lookups
+    files = {item.get('path', '').split('/')[-1].lower() for item in tree if item.get('type') != 'tree'}
+    
+    tasks = [
+        {"id": "clone", "title": "Clone the repository to your local machine"},
+        {"id": "ide", "title": "Open the project in your preferred IDE"}
+    ]
+    
+    if "readme.md" in files:
+        tasks.append({"id": "readme", "title": "Read through the README.md for project-specific context"})
+    
+    if ".env.example" in files or ".env.template" in files or ".env.sample" in files:
+        tasks.append({"id": "env", "title": "Duplicate the example environment file to .env and fill in required secrets"})
+        
+    if "package.json" in files:
+        tasks.append({"id": "npm", "title": "Install Node.js dependencies (run `npm install`, `yarn`, or `pnpm install`)"})
+        
+    if "requirements.txt" in files:
+        tasks.append({"id": "pip", "title": "Create a Python virtual environment and run `pip install -r requirements.txt`"})
+        
+    if "docker-compose.yml" in files or "docker-compose.yaml" in files:
+        tasks.append({"id": "docker", "title": "Start background services using `docker-compose up -d`"})
+        
+    if "makefile" in files:
+        tasks.append({"id": "make", "title": "Explore the Makefile for available build/run commands"})
+        
+    return tasks
+
+
 # ── Route ─────────────────────────────────────────────────────────────────────
 
 @bp.route('/analyze', methods=['POST'])
@@ -321,13 +353,17 @@ def analyze_repository():
             print("[Analyze] WatsonX not configured — using fallback template")
             documentation = build_fallback_documentation(owner, repo, repo_info)
 
+        # Generate Checklist
+        checklist = generate_deterministic_checklist(repo_info)
+
         metadata = {
             'repo_name':          repo,
             'owner':              owner,
             'tech_stack':         repo_info.get('languages', []),
-            'dependencies_count': len(repo_info.get('contents', [])),
+            'dependencies_count': len(repo_info.get('tree', [])),
             'generated_at':       datetime.utcnow().isoformat() + 'Z',
             'ai_generated':       ai_generated,
+            'checklist':          checklist,
         }
 
         return jsonify({
