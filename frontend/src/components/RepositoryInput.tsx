@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 interface RepositoryInputProps {
   onSubmit: (repoUrl: string) => void;
   isLoading: boolean;
-  hasGitHubToken?: boolean;
 }
 
 const EXAMPLE_REPOS = [
@@ -15,7 +14,7 @@ const EXAMPLE_REPOS = [
 /** Pattern: https://github.com/owner/repo or http variant, optional trailing slash */
 const GITHUB_URL_PATTERN = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/;
 
-const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, hasGitHubToken = false }) => {
+const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading }) => {
   const [repoUrl, setRepoUrl] = useState('');
   const [validationError, setValidationError] = useState('');
 
