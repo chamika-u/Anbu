@@ -280,15 +280,21 @@ function App() {
             !user ? <Navigate to="/login" /> : (
               !result && !isLoading ? (
                 <>
-                  <div className="fade-in mb-6">
-                    <h2 className="text-3xl font-bold text-ibm-gray mb-6">Your Dashboard</h2>
+                  <div className="fade-in mb-12">
+                    <div className="max-w-4xl mx-auto mb-8">
+                      <h2 className="text-3xl font-bold text-ibm-gray">Your Dashboard</h2>
+                      <p className="text-gray-500 text-sm mt-2">Manage your private repository access and analyze new codebases.</p>
+                    </div>
+                    
                     <GitHubTokenManager
                       hasToken={user.has_github_token ?? false}
                       onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
                     />
                     <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} />
                   </div>
-                  <RecentAnalyses onSelect={handleSelectHistory} />
+                  <div className="max-w-6xl mx-auto">
+                    <RecentAnalyses onSelect={handleSelectHistory} />
+                  </div>
                 </>
               ) : null
             )
