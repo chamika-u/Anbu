@@ -32,19 +32,6 @@ const ProgressRing: React.FC<{ percent: number; size?: number; stroke?: number }
   );
 };
 
-const LangDot: React.FC<{ lang: string; index: number }> = ({ lang, index }) => {
-  const palette = [
-    'bg-blue-500', 'bg-purple-500', 'bg-teal-500',
-    'bg-orange-400', 'bg-pink-500', 'bg-indigo-500',
-  ];
-  return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-opacity-10 text-white`}
-      style={{ background: 'rgba(255,255,255,0.1)' }}>
-      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${palette[index % palette.length]}`} />
-      {lang}
-    </span>
-  );
-};
 
 const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
   const [history, setHistory] = useState<HistoryAnalysis[]>([]);
