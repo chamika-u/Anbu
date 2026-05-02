@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 from app.services.watsonx_service import get_watsonx_service
+from app.services.default_ai_service import get_default_ai_service
 import requests
 import re
 import json
@@ -377,6 +378,7 @@ def analyze_repository():
 
                 # Try AI generation
                 watsonx_service = get_watsonx_service()
+                default_service = get_default_ai_service()
                 ai_generated = False
                 documentation = ''
 
@@ -393,13 +395,17 @@ def analyze_repository():
                     else:
                         # WatsonX call failed at runtime — fall back gracefully
                         wx_error = wx_response.get('error', 'Unknown WatsonX error')
-                        print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback template")
-                        yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using fallback template...'})}\n\n"
-                        documentation = build_fallback_documentation(owner, repo, repo_info)
+                        print(f"[Analyze] WatsonX runtime error: {wx_error} — using fallback")
+                        yield f"data: {json.dumps({'status': 'progress', 'message': 'AI generation failed. Using default code...'})}\n\n"
+                        # Use default service as fallback
+                        df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
+                        documentation = df_response['content']
                 else:
-                    print("[Analyze] WatsonX not configured — using fallback template")
-                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation from template...'})}\n\n"
-                    documentation = build_fallback_documentation(owner, repo, repo_info)
+                    print("[Analyze] WatsonX not configured — using default code")
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Generating documentation using default code...'})}\n\n"
+                    # Use default service
+                    df_response = default_service.generate_documentation('', repo_info={'owner': owner, 'repo_name': repo, 'language': repo_info.get('language'), 'languages': repo_info.get('languages'), 'description': repo_info.get('description')})
+                    documentation = df_response['content']
 
                 yield f"data: {json.dumps({'status': 'progress', 'message': 'Finalising documentation and checklist...'})}\n\n"
                 # Generate Checklist
