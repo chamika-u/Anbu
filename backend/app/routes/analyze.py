@@ -48,14 +48,15 @@ def fetch_github_repo_data(owner: str, repo: str):
 
         repo_data = repo_response.json()
 
-        # Contents (root-level files)
-        contents_resp = requests.get(
-            f'https://api.github.com/repos/{owner}/{repo}/contents',
+        # Fetch full recursive tree for architecture diagram
+        default_branch = repo_data.get('default_branch', 'main')
+        tree_resp = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}/git/trees/{default_branch}?recursive=1',
             headers=headers,
             verify=False,
             timeout=15,
         )
-        contents_data = contents_resp.json() if contents_resp.status_code == 200 else []
+        tree_data = tree_resp.json().get('tree', []) if tree_resp.status_code == 200 else []
 
         # Language breakdown
         languages_resp = requests.get(
@@ -74,8 +75,8 @@ def fetch_github_repo_data(owner: str, repo: str):
             'stars':          repo_data.get('stargazers_count', 0),
             'forks':          repo_data.get('forks_count', 0),
             'topics':         repo_data.get('topics', []),
-            'contents':       contents_data if isinstance(contents_data, list) else [],
-            'default_branch': repo_data.get('default_branch', 'main'),
+            'tree':           tree_data,
+            'default_branch': default_branch,
             'created_at':     repo_data.get('created_at'),
             'updated_at':     repo_data.get('updated_at'),
         }, None
@@ -150,12 +151,72 @@ Write the documentation in Markdown. Include the following sections:
 Make every section actionable, beginner-friendly, and use examples where helpful."""
 
 
+def generate_deterministic_mermaid(repo_name: str, tree: list) -> str:
+    """Generate a Mermaid diagram based on the actual repository root contents."""
+    if not tree:
+        return "graph LR\n    A[Repository] --> B[Empty]"
+        
+    lines = ["graph LR", f'    Root["📦 {repo_name}"]']
+    lines.append('    style Root fill:#161616,color:#ffffff,stroke:#161616,stroke-width:2px,rx:10,ry:10')
+    
+    ignore_dirs = {'node_modules', 'venv', '.git', '.github', 'dist', 'build', '__pycache__', '.next'}
+    
+    # Filter and sort paths
+    paths = []
+    for item in tree:
+        path = item.get('path', '')
+        parts = path.split('/')
+        if any(part in ignore_dirs or part.startswith('.') and len(part) > 1 for part in parts):
+            continue
+        paths.append((path, item.get('type') == 'tree'))
+        
+    # Process folders first, then files
+    paths.sort(key=lambda x: (not x[1], x[0].lower()))
+    
+    MAX_NODES = 40
+    node_count = 0
+    added_nodes = {'': 'Root'}
+    
+    for path, is_dir in paths:
+        if node_count >= MAX_NODES:
+            break
+            
+        parts = path.split('/')
+        parent_path = '/'.join(parts[:-1])
+        name = parts[-1]
+        
+        # If parent isn't in graph (e.g. skipped by limits), skip this
+        if parent_path not in added_nodes:
+            continue
+            
+        parent_id = added_nodes[parent_path]
+        node_id = f"node_{node_count}"
+        added_nodes[path] = node_id
+        
+        if is_dir:
+            lines.append(f'    {parent_id} --> {node_id}["📁 {name}"]')
+            lines.append(f'    style {node_id} fill:#f0f4ff,stroke:#0f62fe,stroke-width:2px')
+        else:
+            lines.append(f'    {parent_id} --> {node_id}["📄 {name}"]')
+            lines.append(f'    style {node_id} fill:#ffffff,stroke:#8d8d8d,stroke-width:1px')
+            
+        node_count += 1
+            
+    if len(paths) > MAX_NODES:
+        lines.append(f'    Root -.-> More["... and {len(paths) - MAX_NODES} more items hidden"]')
+        lines.append(f'    style More fill:#f4f4f4,stroke:#e0e0e0,stroke-dasharray: 5 5')
+    
+    return "\n".join(lines)
+
+
 def build_fallback_documentation(owner: str, repo: str, repo_info: dict) -> str:
     """Return a plain template when WatsonX AI is unavailable."""
     language  = repo_info.get('language', 'Unknown')
     languages = repo_info.get('languages', [])
     tech_stack = ', '.join(languages) if languages else language
     description = repo_info.get('description') or 'No description provided'
+    
+    mermaid_code = generate_deterministic_mermaid(repo, repo_info.get('tree', []))
 
     return f"""# {repo} — Developer Onboarding Guide
 
@@ -169,6 +230,14 @@ def build_fallback_documentation(owner: str, repo: str, repo_info: dict) -> str:
 | Description | {description} |
 | Primary Language | {language} |
 | Tech Stack | {tech_stack} |
+
+## Repository Architecture
+
+This is the live directory structure fetched directly from GitHub:
+
+```mermaid
+{mermaid_code}
+```
 
 ## Getting Started
 
@@ -185,14 +254,6 @@ cd {repo}
 ```
 
 Then install dependencies and configure environment variables as described in the repository's own README.
-
-## Project Structure
-
-Explore the repository to understand:
-- Main application code
-- Configuration files (`.env`, `config.*`)
-- Tests (look for a `tests/` or `spec/` folder)
-- Documentation (`docs/`, `README.md`)
 
 ## Development Workflow
 

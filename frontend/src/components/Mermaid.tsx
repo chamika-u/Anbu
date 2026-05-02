@@ -1,12 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'default',
-  securityLevel: 'loose',
-  fontFamily: 'IBM Plex Sans, sans-serif'
-});
 
 interface MermaidProps {
   chart: string;
@@ -18,21 +10,65 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     const renderChart = async () => {
       try {
         setError(false);
+        
+        // Dynamically load Mermaid from CDN to bypass npm network issues
+        if (!(window as any).mermaid) {
+          await new Promise<void>((resolve, reject) => {
+            if (document.getElementById('mermaid-script')) {
+              const checkInterval = setInterval(() => {
+                if ((window as any).mermaid) {
+                  clearInterval(checkInterval);
+                  resolve();
+                }
+              }, 100);
+              return;
+            }
+
+            const script = document.createElement('script');
+            script.id = 'mermaid-script';
+            script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js';
+            script.onload = () => {
+              const m = (window as any).mermaid;
+              m.initialize({
+                startOnLoad: false,
+                theme: 'default',
+                securityLevel: 'loose',
+                fontFamily: 'IBM Plex Sans, sans-serif'
+              });
+              resolve();
+            };
+            script.onerror = () => reject(new Error('Failed to load Mermaid JS'));
+            document.head.appendChild(script);
+          });
+        }
+
+        const mermaid = (window as any).mermaid;
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         const { svg } = await mermaid.render(id, chart);
-        setSvgCode(svg);
+        
+        if (isMounted) {
+          setSvgCode(svg);
+        }
       } catch (err) {
         console.error('Mermaid rendering failed', err);
-        setError(true);
+        if (isMounted) {
+          setError(true);
+        }
       }
     };
 
     if (chart) {
       renderChart();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [chart]);
 
   if (error) {
