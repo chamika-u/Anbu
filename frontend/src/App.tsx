@@ -10,6 +10,8 @@ import RecentAnalyses from './components/RecentAnalyses';
 import AuthPage from './components/AuthPage';
 import { analyzeRepository, saveAnalysis, type AnalyzeResponse, type RepoMetadata, type HistoryAnalysis } from './services/api';
 import { useAuth } from './context/AuthContext';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 import './App.css';
 
 interface ToastState {
@@ -46,22 +48,17 @@ function App() {
     setIsLoading(true);
     setError(null);
     setResult(null);
-
-    let messageIndex = 0;
-    setLoadingMessage(LOADING_MESSAGES[0]);
-    const messageInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % LOADING_MESSAGES.length;
-      setLoadingMessage(LOADING_MESSAGES[messageIndex]);
-    }, 3500);
+    setLoadingMessage('Initializing...');
 
     try {
-      const response = await analyzeRepository(repoUrl);
+      const response = await analyzeRepository(repoUrl, (msg) => {
+        setLoadingMessage(msg);
+      });
       setResult(response);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(message);
     } finally {
-      clearInterval(messageInterval);
       setIsLoading(false);
       setLoadingMessage(LOADING_MESSAGES[0]);
     }
@@ -94,7 +91,30 @@ function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('Documentation downloaded!', 'success');
+    showToast('Documentation downloaded as Markdown!', 'success');
+  };
+
+  const handleDownloadPdf = () => {
+    if (!result?.documentation) return;
+    showToast('Generating PDF... this may take a moment.', 'info');
+    const repoName = (result.metadata as RepoMetadata | undefined)?.repo_name ?? 'documentation';
+    const element = document.getElementById('documentation-pdf-content');
+    if (!element) return;
+    
+    const opt = {
+      margin:       10,
+      filename:     `${repoName}-onboarding.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().from(element).set(opt).save().then(() => {
+      showToast('Documentation downloaded as PDF!', 'success');
+    }).catch((err: any) => {
+      showToast('Failed to generate PDF.', 'error');
+      console.error(err);
+    });
   };
 
   const handleCopyShareUrl = async () => {
@@ -284,6 +304,7 @@ function App() {
               metadata={result.metadata}
               shareUrl={result.share_url}
               onDownload={handleDownload}
+              onDownloadPdf={handleDownloadPdf}
               onCopyShareUrl={handleCopyShareUrl}
             />
           </div>

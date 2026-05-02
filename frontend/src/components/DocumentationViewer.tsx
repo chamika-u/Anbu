@@ -10,6 +10,7 @@ interface DocumentationViewerProps {
   metadata?: RepoMetadata;
   shareUrl?: string;
   onDownload: () => void;
+  onDownloadPdf?: () => void;
   onCopyShareUrl: () => void;
 }
 
@@ -18,6 +19,7 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
   metadata,
   shareUrl,
   onDownload,
+  onDownloadPdf,
   onCopyShareUrl,
 }) => {
   const [activeTab, setActiveTab] = useState<'rendered' | 'raw'>('rendered');
@@ -71,13 +73,26 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
               <button
                 id="download-btn"
                 onClick={onDownload}
-                className="flex items-center gap-2 px-4 py-2 bg-ibm-teal text-white text-sm font-medium rounded-xl hover:bg-teal-600 active:scale-95 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium rounded-xl transition-all"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Download .md
+                .MD
               </button>
+
+              {onDownloadPdf && (
+                <button
+                  id="download-pdf-btn"
+                  onClick={onDownloadPdf}
+                  className="flex items-center gap-2 px-4 py-2 bg-ibm-teal text-white text-sm font-medium rounded-xl hover:bg-teal-600 active:scale-95 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  PDF
+                </button>
+              )}
 
               {shareUrl && (
                 <button
@@ -133,7 +148,7 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
       </div>
 
       {/* ── Documentation content ────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+      <div id="documentation-pdf-content" className="bg-white rounded-2xl shadow-md overflow-hidden">
         {activeTab === 'rendered' ? (
           <div className="p-8 md:p-10 markdown-content prose prose-lg max-w-none">
             <ReactMarkdown 
