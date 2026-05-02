@@ -32,7 +32,6 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
   }
 
   return (
-  return (
     <div className="mt-8 max-w-6xl mx-auto fade-in">
       
       {/* ── Analytics Overview ─────────────────────────────────────────── */}
