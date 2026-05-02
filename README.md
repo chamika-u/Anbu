@@ -207,7 +207,7 @@ cp .env.example .env
 # Edit .env with your IBM Cloud credentials
 
 # Run Flask server
-python app.py
+python run.py
 ```
 
 Backend will run on `http://localhost:5000`
@@ -405,7 +405,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Current Version**: 1.0.0 (MVP)  
 **Status**: Active Development  
-**Last Updated**: May 1, 2026
+**Last Updated**: May 3, 2026
 
 ---
 
