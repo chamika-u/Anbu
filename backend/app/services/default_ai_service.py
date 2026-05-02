@@ -83,6 +83,10 @@ class DefaultAIService:
         tech_stack = ', '.join(languages) if languages else language
         description = repo_info.get('description') or 'No description provided'
         
+        # Generate Mermaid diagram
+        tree = repo_info.get('tree', [])
+        mermaid_code = self.generate_deterministic_mermaid(repo, tree)
+        
         # This is essentially what was in analyze.py, moved here for modularity
         content = f"""# {repo} — Developer Onboarding Guide
 
@@ -97,7 +101,14 @@ class DefaultAIService:
 ## 2. Technology Stack
 The project primarily uses {tech_stack}. Based on the repository structure, it appears to be a modern development project with standard configurations.
 
-## 3. Getting Started
+## 3. Repository Architecture
+The following diagram shows the core directory structure of the repository:
+
+```mermaid
+{mermaid_code}
+```
+
+## 4. Getting Started
 To get started with {repo}, follow these steps:
 
 ### Prerequisites
