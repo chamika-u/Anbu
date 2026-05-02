@@ -279,46 +279,38 @@ function App() {
           <Route path="/dashboard" element={
             !user ? <Navigate to="/login" /> : (
               !result && !isLoading ? (
-                <>
-                  {/* ── Dashboard Hero ── */}
-                  <div className="fade-in">
-                    <div className="max-w-6xl mx-auto mb-8">
-                      {/* Welcome bar */}
-                      <div className="relative rounded-2xl overflow-hidden mb-6 bg-gradient-to-r from-ibm-gray via-slate-800 to-slate-900 px-8 py-7">
-                        {/* decorative blobs */}
-                        <div className="absolute -top-10 -right-10 w-56 h-56 bg-ibm-blue rounded-full opacity-10 blur-3xl pointer-events-none" />
-                        <div className="absolute bottom-0 right-1/3 w-40 h-40 bg-ibm-purple rounded-full opacity-10 blur-3xl pointer-events-none" />
-                        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div>
-                            <p className="text-xs font-semibold text-blue-300 uppercase tracking-widest mb-1">Welcome back</p>
-                            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-                              {user.email.split('@')[0]}
-                              <span className="text-ibm-blue">.</span>
-                            </h1>
-                            <p className="text-sm text-slate-400 mt-1">Ready to onboard a new repository?</p>
-                          </div>
-                          <div className="flex-shrink-0">
-                            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-sm">
-                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                              <span className="text-xs font-medium text-slate-300">AI Engine Active</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Token manager + Repo input */}
+                <div className="fade-in py-12">
+                  {/* ── Focused Analysis Header ── */}
+                  <div className="max-w-4xl mx-auto text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl font-black text-ibm-gray mb-4 tracking-tight">
+                      Dashboard<span className="text-ibm-blue">.</span>
+                    </h1>
+                    <p className="text-lg font-bold text-gray-400 uppercase tracking-widest mb-10">
+                      Analyze a new repository to get started
+                    </p>
+                    
+                    <div className="max-w-2xl mx-auto mb-8">
                       <GitHubTokenManager
                         hasToken={user.has_github_token ?? false}
                         onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
                       />
-                      <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} hasGitHubToken={user.has_github_token ?? false} />
                     </div>
-                    <RecentAnalyses onSelect={handleSelectHistory} />
+                    
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-ibm-blue to-ibm-purple rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200" />
+                      <div className="relative bg-white rounded-[2rem] p-2">
+                        <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} hasGitHubToken={user.has_github_token ?? false} />
+                      </div>
+                    </div>
                   </div>
-                </>
+
+                  {/* ── History Section ── */}
+                  <RecentAnalyses onSelect={handleSelectHistory} />
+                </div>
               ) : null
             )
           } />
+
 
         </Routes>
 
