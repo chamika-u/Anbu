@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: anbu-db
+    restart: always
+    environment:
+      POSTGRES_USER: anbu_user
+      POSTGRES_PASSWORD: anbu_password
+      POSTGRES_DB: anbu_db
+    ports:
+      - "5433:5432" # Map to 5433 on host to avoid conflicts with local Postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: anbu-backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://anbu_user:anbu_password@db:5432/anbu_db
+      - SECRET_KEY=anbu-secret-key-123
+      - IBM_WATSONX_API_KEY=${IBM_WATSONX_API_KEY}
+      - IBM_WATSONX_PROJECT_ID=${IBM_WATSONX_PROJECT_ID}
+      - IBM_WATSONX_URL=${IBM_WATSONX_URL}
+      - IBM_WATSONX_MODEL_ID=${IBM_WATSONX_MODEL_ID}
+      - FLASK_ENV=production
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:5000 # In browser, localhost refers to the user's machine
+    container_name: anbu-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -230,6 +230,23 @@ npm run dev
 
 Frontend will run on `http://localhost:5173`
 
+### 🐳 Running with Docker (Recommended)
+
+The easiest way to run the entire system (Frontend, Backend, and Database) is using Docker Compose.
+
+1. **Prerequisites**: [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed.
+2. **Setup Credentials**: Ensure your `.env` file in the root or backend directory has your IBM watsonx AI credentials.
+3. **Launch**:
+   ```bash
+   docker-compose up --build
+   ```
+4. **Access**:
+   - Frontend: `http://localhost`
+   - Backend API: `http://localhost:5000`
+   - Database: `localhost:5433` (on host)
+
+The system will automatically initialize the PostgreSQL database and link all services.
+
 ### Environment Variables
 
 #### Backend (.env)
