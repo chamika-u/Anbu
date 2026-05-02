@@ -286,7 +286,7 @@ function App() {
                       hasToken={user.has_github_token ?? false}
                       onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
                     />
-                    <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} hasGitHubToken={user.has_github_token ?? false} />
+                    <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} />
                   </div>
                   <RecentAnalyses onSelect={handleSelectHistory} />
                 </>
