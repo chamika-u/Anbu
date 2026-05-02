@@ -11,6 +11,11 @@ services:
       - "5433:5432" # Map to 5433 on host to avoid conflicts with local Postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anbu_user -d anbu_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
@@ -27,7 +32,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     build:
