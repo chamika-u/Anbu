@@ -128,7 +128,7 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
-                code({node, inline, className, children, ...props}: any) {
+                code({ inline, className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean }) {
                   const match = /language-(\w+)/.exec(className || '');
                   if (!inline && match && match[1] === 'mermaid') {
                     return <Mermaid chart={String(children).replace(/\n$/, '')} />;
