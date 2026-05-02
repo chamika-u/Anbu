@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Mermaid from './Mermaid';
 import type { RepoMetadata } from '../services/api';
 
 interface DocumentationViewerProps {
@@ -124,7 +125,22 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
       <div className="bg-white rounded-2xl shadow-md overflow-hidden">
         {activeTab === 'rendered' ? (
           <div className="p-8 md:p-10 markdown-content prose prose-lg max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({node, inline, className, children, ...props}: any) {
+                  const match = /language-(\w+)/.exec(className || '');
+                  if (!inline && match && match[1] === 'mermaid') {
+                    return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+                  }
+                  return (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+              }}
+            >
               {documentation}
             </ReactMarkdown>
           </div>

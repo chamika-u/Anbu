@@ -116,30 +116,33 @@ Write the documentation in Markdown. Include the following sections:
 - Languages, frameworks, and major libraries used
 - Development tools and runtime versions
 
-## 3. Getting Started
+## 3. Architecture Visualization
+- Create a Mermaid.js diagram (using `graph TD` or `graph LR`) visualizing the core architecture, data flow, or directory structure of the project.
+- Enclose the diagram in a standard markdown code block with the language set to `mermaid`. Avoid using any HTML tags inside the mermaid labels.
+
+## 4. Getting Started
 - Prerequisites (tools, accounts, and environment)
 - Step-by-step installation guide
 - Running the project locally
 - Environment variables / configuration
 
-## 4. Project Structure
+## 5. Project Structure
 - Directory layout with explanations
 - Key files and their roles
-- Architecture overview
 
-## 5. Development Workflow
+## 6. Development Workflow
 - Branching strategy and commit conventions
 - Code style and linting rules
 - Testing procedures
 - Submitting pull requests
 
-## 6. Common Tasks
+## 7. Common Tasks
 - Adding a new feature
 - Fixing a bug
 - Running the test suite
 - Deploying to production
 
-## 7. Resources & Help
+## 8. Resources & Help
 - Official docs and tutorials
 - Community channels
 - Who to contact for help
