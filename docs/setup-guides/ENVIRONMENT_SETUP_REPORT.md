@@ -2,12 +2,12 @@
 **Date:** May 1, 2026  
 **Project:** Anbu - AI-Powered Document Analysis System
 
-## ✅ Summary
+## Summary
 The environment setup is **MOSTLY WORKING** with one known issue regarding IBM Watson packages.
 
 ---
 
-## 🔧 System Information
+## System Information
 - **Operating System:** Windows 11
 - **Python Version:** 3.14.0
 - **pip Version:** 26.0.1
@@ -16,30 +16,30 @@ The environment setup is **MOSTLY WORKING** with one known issue regarding IBM W
 
 ---
 
-## 📦 Backend Dependencies Status
+## Backend Dependencies Status
 
-### ✅ Successfully Installed Packages (47 packages)
+### Successfully Installed Packages (47 packages)
 | Package | Version | Status |
 |---------|---------|--------|
-| Flask | 3.0.0 | ✅ Installed |
-| Flask-CORS | 4.0.0 | ✅ Installed |
-| Flask-SQLAlchemy | 3.1.1 | ✅ Installed |
-| python-dotenv | 1.0.0 | ✅ Installed |
-| requests | 2.31.0 | ✅ Installed |
-| pytest | 7.4.3 | ✅ Installed |
-| pytest-cov | 4.1.0 | ✅ Installed |
-| black | 23.12.1 | ✅ Installed |
-| flake8 | 7.0.0 | ✅ Installed |
-| SQLAlchemy | 2.0.49 | ✅ Installed |
-| Werkzeug | 3.1.8 | ✅ Installed |
-| Jinja2 | 3.1.6 | ✅ Installed |
+| Flask | 3.0.0 | Installed |
+| Flask-CORS | 4.0.0 | Installed |
+| Flask-SQLAlchemy | 3.1.1 | Installed |
+| python-dotenv | 1.0.0 | Installed |
+| requests | 2.31.0 | Installed |
+| pytest | 7.4.3 | Installed |
+| pytest-cov | 4.1.0 | Installed |
+| black | 23.12.1 | Installed |
+| flake8 | 7.0.0 | Installed |
+| SQLAlchemy | 2.0.49 | Installed |
+| Werkzeug | 3.1.8 | Installed |
+| Jinja2 | 3.1.6 | Installed |
 
-### ❌ Failed to Install (IBM Watson Packages)
+### Failed to Install (IBM Watson Packages)
 | Package | Required Version | Status | Reason |
 |---------|-----------------|--------|--------|
-| ibm-watson | 8.0.0 | ❌ Failed | Python 3.14 compatibility issue |
-| ibm-cloud-sdk-core | 3.19.0 | ❌ Failed | Missing pkg_resources module |
-| ibm-watsonx-ai | 0.2.6 | ❌ Failed | Dependency on ibm-cloud-sdk-core |
+| ibm-watson | 8.0.0 | Failed | Python 3.14 compatibility issue |
+| ibm-cloud-sdk-core | 3.19.0 | Failed | Missing pkg_resources module |
+| ibm-watsonx-ai | 0.2.6 | Failed | Dependency on ibm-cloud-sdk-core |
 
 **Error Details:**
 ```
@@ -76,13 +76,13 @@ This is a known issue with Python 3.14 and older packages that rely on setuptool
 ```bash
 python -m pytest backend/tests/test_health.py -v
 ```
-**Result:** ✅ PASSED (1/1 tests passed in 1.21s)
+**Result:** PASSED (1/1 tests passed in 1.21s)
 
 ### Frontend Build Test
 ```bash
 npm run build
 ```
-**Result:** ✅ SUCCESS (built in 198ms)
+**Result:** SUCCESS (built in 198ms)
 
 ---
 
@@ -105,7 +105,7 @@ npm run build
 
 ---
 
-## 🔴 Known Issues
+## Known Issues
 
 ### Issue #1: IBM Watson Packages Installation Failure
 **Severity:** High  
@@ -138,7 +138,7 @@ The IBM Watson SDK packages (ibm-watson, ibm-cloud-sdk-core, ibm-watsonx-ai) fai
 
 ---
 
-## ✅ What's Working
+## What's Working
 
 1. **Core Flask Application**
    - Flask web framework initialized
@@ -168,10 +168,10 @@ The IBM Watson SDK packages (ibm-watson, ibm-cloud-sdk-core, ibm-watsonx-ai) fai
 ## 📋 Next Steps
 
 ### Immediate Actions Required:
-1. ✅ **Create .env file** from config_template.txt
-2. ⚠️ **Resolve IBM Watson package issue** (choose workaround)
-3. ✅ **Test backend server startup** (without Watson features)
-4. ✅ **Test frontend development server**
+1. **Create .env file** from config_template.txt
+2. **Resolve IBM Watson package issue** (choose workaround)
+3. **Test backend server startup** (without Watson features)
+4. **Test frontend development server**
 
 ### Optional Actions:
 1. Set up virtual environment with Python 3.11
@@ -181,7 +181,7 @@ The IBM Watson SDK packages (ibm-watson, ibm-cloud-sdk-core, ibm-watsonx-ai) fai
 
 ---
 
-## 🚀 Quick Start Commands
+## Quick Start Commands
 
 ### Backend (Without Watson Features)
 ```bash
