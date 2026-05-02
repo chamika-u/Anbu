@@ -374,6 +374,7 @@ def analyze_repository():
         # Save to database
         try:
             user = get_optional_user()
+            print(f"[Analyze] Saving record. User ID resolved: {user.id if user else 'None'}")
             analysis_record = RepositoryAnalysis(
                 repo_url=repo_url,
                 owner=owner,
