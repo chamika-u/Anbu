@@ -1,431 +1,184 @@
-#  Anbu - AI-Powered Developer Onboarding Platform
+# IBM Bob Dev Day Hackathon – Submission Report
 
-> **Anbu** (அன்பு) means "Love" in Tamil - We help companies show love to their new developers through intelligent onboarding.
-
-**Powered by IBM watsonx AI**
-
----
-
-##  About Anbu
-
-Anbu is an AI-powered web application that automatically generates comprehensive, beginner-friendly onboarding documentation for any GitHub repository. It helps newly hired junior developers quickly understand codebases, tech stacks, and project structures - reducing onboarding time from weeks to hours.
+*Team / Individual:* Chamika (Anbu Team)  
+*Submission Date:* 2026-05-03
 
 ---
 
-##  Problem Statement
+## 1. Problem & Solution Statement
 
-New developers joining a company face significant challenges:
+### Problem
+Developer onboarding is a significant bottleneck in engineering teams. New hires often face undocumented or complex codebases, leading to a 2–4 week ramp-up period where they are unproductive. Senior developers are frequently pulled away from their work to explain basic architecture and setup, creating a resource drain across the organization.
 
-- **Steep Learning Curve**: Understanding existing codebases takes 2-4 weeks
-- **Missing Documentation**: Technical documentation is often outdated or incomplete
-- **Time Drain**: Senior developers spend valuable hours explaining project basics
-- **Slow Productivity**: High learning curve leads to delayed contribution
-- **Frustration**: New developers feel overwhelmed and unsupported
-
-**Result**: Companies lose productivity, senior developers lose focus time, and junior developers struggle unnecessarily.
+### Solution
+**Anbu** (Tamil for "Love") is an AI-native platform that automates the generation of comprehensive onboarding guides for any GitHub repository. By leveraging **IBM watsonx.ai**, it provides a deep semantic understanding of the codebase, generating setup guides, tech stack breakdowns, and interactive checklists that reduce onboarding time from weeks to hours.
 
 ---
 
-##  Our Solution
+## 2. How IBM Bob Was Used
 
-Anbu leverages **IBM watsonx AI** to intelligently analyze any GitHub repository and automatically generate:
+IBM Bob served as the lead developer and architect for the Anbu platform, handling both complex infrastructure migrations and frontend refinement.
 
--  **Project Overview** - Clear explanation of what the project does and its purpose
--  **Tech Stack Breakdown** - Detailed list of technologies, frameworks, and tools used
--  **Setup Instructions** - Step-by-step installation and configuration guide
--  **Architecture Overview** - High-level system design and structure
--  **Project Structure** - Directory tree with explanations of key files
--  **Getting Started Guide** - First commands to run and development workflow
--  **Key Concepts** - Important patterns, abstractions, and design decisions
--  **Troubleshooting** - Common issues and their solutions
-
-**Impact**: Reduce onboarding time from weeks to hours, allowing new developers to contribute faster.
-
----
-
-##  Key Features
-
-### Core Capabilities
-
-- ** Public Repository Support** - Paste any GitHub URL to analyze
-- ** AI-Powered Analysis** - IBM watsonx AI understands code structure and patterns
-- ** Comprehensive Documentation** - Generates beginner-friendly, actionable guides
-- ** Persistent Dashboard** - Save your generated documentation to a personal dashboard
-- ** Progress Tracking** - Keep track of your onboarding progress natively within the app
-- ** Real-time Updates** - Live, repository-specific Server-Sent Events (SSE) progress updates during analysis
-- ** Instant Preview & Export** - View documentation in browser or download as Markdown/PDF
-- ** User Authentication** - Secure login and registration for personalized experiences
-
-### Technical Highlights
-
-- **Multi-Language Support** - JavaScript, TypeScript, Python, Java, Go, Ruby, and more
-- **Smart Tech Stack Detection** - Automatically identifies frameworks, containerization, and dependencies
-- **Dynamic SSE Streaming** - Backend analyzes repository contents and streams specific loading statuses (e.g. "Analysing frontend components")
-- **Robust PostgreSQL Backend** - Scalable, relational data storage instead of file-based persistence
-- **Responsive Design** - Works seamlessly on desktop and mobile devices
+• *Task 1 – Backend Refactor:* Used Bob to migrate the persistence layer from JSON files to a robust PostgreSQL database.
+• *Task 2 – Architecture Verification:* Used Bob to verify and run the containerized architecture using Docker Compose.
+• *Task 3 – Dashboard Implementation:* Used Bob to build the personalized user dashboard and refactor UI error handling.
+• *Task 4 – Sync Logic:* Used Bob to implement real-time synchronization between the frontend checklist and the database.
+• *Task 5 – watsonx Integration:* Used Bob to establish the IBM watsonx AI service layer with intelligent fallback mechanisms.
+• *Task 6 – Documentation Cleanup:* Used Bob to professionalize the entire repository by standardizing Markdown and removing emojis.
+• *Task 7 – Deployment Orchestration:* Used Bob to configure Docker environments and prepare for IBM Code Engine deployment.
+• *Task 8 – QA & Validation:* Used Bob to perform deep testing of the analysis routes and watsonx integration.
+• *Task 9 – Submission Reporting:* Used Bob to generate this final submission report and consolidate task histories.
 
 ---
 
-##  Technology Stack
+## 3. Code Repository
 
-### Frontend
-- **React** - Modern UI library for building interactive interfaces
-- **Vite** - Fast build tool and development server
-- **TailwindCSS** - Utility-first CSS framework for rapid styling
-- **React Markdown** - Render Markdown documentation beautifully
-- **Axios** - HTTP client for API communication
+• *Public Repo URL:* [https://github.com/chamika-u/Anbu](https://github.com/chamika-u/Anbu)  
+• *Main Branch:* `main`
 
-### Backend
-- **Flask** (Python) - Lightweight web framework
-- **PostgreSQL** - Robust relational database for users, documentation, and progress states
-- **IBM watsonx AI SDK** - Access to powerful foundation models
-- **PyGithub** - GitHub API integration for repository access
-- **Server-Sent Events (SSE)** - Real-time streaming for progress tracking
+Repository structure:
 
-### IBM Cloud Services
-- **IBM watsonx AI** - Core AI capabilities for code analysis and documentation generation
-- **IBM Code Engine** - Serverless container platform for backend deployment
-- **IBM Cloud Object Storage** - Scalable storage for generated documentation
-
-### APIs & Integrations
-- **GitHub REST API** - Fetch repository data and file contents
-- **watsonx AI API** - Generate intelligent documentation using LLMs
-
----
-
-##  Project Scope
-
-### MVP Features (Current Implementation)
-
- **Repository Analysis**
-- Support for public GitHub repositories
-- Automatic tech stack detection
-- Dependency extraction
-- Project structure analysis
-
- **AI Documentation Generation**
-- Comprehensive onboarding guides
-- Beginner-friendly explanations
-- Step-by-step instructions
-- Code examples and best practices
-
- **User Interface**
-- Clean, intuitive web interface
-- Real-time progress indicators
-- Documentation preview
-- Download functionality
-
- **Cloud Integration & Persistence**
-- PostgreSQL database integration
-- Persistent, user-specific dashboard
-- Interactive progress state synchronization
-
-### Out of Scope (Future Enhancements)
-
- **Private Repository Support** - Requires OAuth implementation
- **Team Collaboration** - Shared workspaces and comments
- **Version Control** - Track documentation changes over time
- **Analytics Dashboard** - Usage metrics and insights
-
----
-
-##  System Architecture
-
-```
-
-                        User                              
-
-                     
-                     
-
-              React Frontend (Vercel)                     
-   Repository URL Input                                  
-   Documentation Viewer                                  
-   Download & Share Features                             
-
-                      HTTPS/REST API
-                     
-
-         Flask Backend (IBM Code Engine)                  
-   Request Validation                                    
-   Repository Analysis                                   
-   AI Integration                                        
-   Document Generation                                   
-
-                                   
-                                   
-      
- GitHub        IBM             IBM Cloud       
-   API        watsonx AI      Object Storage   
-                                               
-  Fetch       Analyze        Store Docs     
-   Repos        Code           Generate URLs  
-  Get         Generate       Serve Files    
-   Files        Docs                           
-      
+```text
+Anbu/
+├─ backend/
+│  ├─ app/
+│  │  ├─ routes/         # API endpoints (analyze, auth, history)
+│  │  ├─ services/       # watsonx and GitHub logic
+│  │  └─ models/         # Database schemas
+├─ frontend/
+│  ├─ src/
+│  │  ├─ components/     # Mermaid, Dashboard, Progress UI
+│  │  └─ pages/          # Analysis and History views
+├─ bob_sessions/         # AI Task Histories
+├─ docker-compose.yml
+└─ README.md
 ```
 
 ---
 
-##  Getting Started
+## 4. Video Demonstration
+
+• Public Video URL: [Paste your demo video URL here]
+
+Briefly describe what the video shows:
+The video showcases the end-to-end user journey: from entering a repository URL, watching real-time analysis progress, viewing AI-generated Mermaid diagrams and documentation, to tracking onboarding progress on the interactive dashboard.
+
+---
+
+## 5. Bob Sessions Directory
+
+All Bob task-session reports are stored in the `bob_sessions/` directory.
+
+Each Bob task includes:
+• A screenshot of the Task Session Consumption Summary.
+• An exported task-history Markdown file.
+
+### Bob Session Entries
+
+#### Task 1: PostgreSQL Migration
+• Description: Migrated the application from local file storage to a professional PostgreSQL database.
+• Summary Screenshot: bob_sessions/task-01_summary.png
+• Exported History: bob_sessions/task-01_history.md
+
+#### Task 2: Architecture Running
+• Description: Verified the project architecture and service connectivity using Docker.
+• Summary Screenshot: bob_sessions/task-02_summary.png
+• Exported History: bob_sessions/task-02_history.md
+
+#### Task 3: Onboarding Dashboard
+• Description: Developed the user-linked progress tracking and history dashboard.
+• Summary Screenshot: bob_sessions/task-03_summary.png
+• Exported History: bob_sessions/task-03_history.md
+
+#### Task 4: Real-Time Sync
+• Description: Implemented bi-directional synchronization between the UI and database.
+• Summary Screenshot: bob_sessions/task-04_summary.png
+• Exported History: bob_sessions/task-04_history.md
+
+#### Task 5: watsonx Service
+• Description: Integrated IBM watsonx AI SDK and implemented fallback AI services.
+• Summary Screenshot: bob_sessions/task-05_summary.png
+• Exported History: bob_sessions/task-05_history.md
+
+#### Task 6: Documentation Refactor
+• Description: Cleaned up and professionalized all repository documentation.
+• Summary Screenshot: bob_sessions/task-06_summary.png
+• Exported History: bob_sessions/task-06_history.md
+
+#### Task 7: Deployment Configuration
+• Description: Optimized Docker settings and environment variable handling.
+• Summary Screenshot: bob_sessions/task-07_summary.png
+• Exported History: bob_sessions/task-07_history.md
+
+#### Task 8: Service Validation
+• Description: Conducted end-to-end testing of the analysis and generation pipeline.
+• Summary Screenshot: bob_sessions/task-08_summary.png
+• Exported History: bob_sessions/task-08_history.md
+
+#### Task 9: Final Submission Report
+• Description: Consolidated all project metrics and created the final hackathon report.
+• Summary Screenshot: bob_sessions/task-09_summary.png
+• Exported History: bob_sessions/task-09_history.md
+
+---
+
+## 6. Features Implemented
+
+• **AI-Powered Analysis**: Deep semantic analysis of GitHub repos using IBM watsonx.ai.
+• **Real-Time Progress (SSE)**: Live streaming of analysis status to the user interface.
+• **Mermaid.js Visualization**: Automatic generation of architectural diagrams from code structure.
+• **Interactive Checklist**: Dynamic onboarding tasks generated based on repository contents.
+• **Personal Dashboard**: Persistent history of analyzed projects and onboarding progress.
+• **Secure Authentication**: User accounts with encrypted token storage for private repo access.
+
+---
+
+## 7. Tech Stack
+
+• **Frontend**: React (Vite), TailwindCSS, Axios, React Markdown, Mermaid.js.
+• **Backend**: Python (Flask), SQLAlchemy, Server-Sent Events (SSE).
+• **Database**: PostgreSQL (Relational persistence).
+• **AI / IBM Tools**: IBM Bob (Lead Dev), IBM watsonx.ai (LLM Engine).
+• **DevOps**: Docker, Docker Compose.
+
+---
+
+## 8. How to Run the Project
 
 ### Prerequisites
+- Docker Desktop
+- IBM watsonx.ai API Credentials
 
-- **Python 3.9+** - Backend runtime
-- **Node.js 18+** - Frontend development
-- **IBM Cloud Account** - Access to watsonx AI and Object Storage
-- **GitHub Account** - For repository access (optional: personal access token)
-
-### Installation
-
-#### 1. Clone the Repository
-
+### Steps
 ```bash
+# 1. Clone the repository
 git clone https://github.com/chamika-u/Anbu.git
 cd Anbu
-```
 
-#### 2. Backend Setup
-
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment variables
+# 2. Configure Environment
 cp .env.example .env
-# Edit .env with your IBM Cloud credentials
+# Edit .env with your WATSONX_API_KEY and WATSONX_PROJECT_ID
 
-# Run Flask server
-python run.py
+# 3. Launch with Docker
+docker-compose up --build
 ```
-
-Backend will run on `http://localhost:5000`
-
-#### 3. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Configure environment variables
-cp .env.example .env
-# Edit .env with backend API URL
-
-# Start development server
-npm run dev
-```
-
-Frontend will run on `http://localhost:5173`
-
-###  Running with Docker (Recommended)
-
-The easiest way to run the entire system (Frontend, Backend, and Database) is using Docker Compose.
-
-1. **Prerequisites**: [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed.
-2. **Setup Credentials**: Ensure your `.env` file in the root or backend directory has your IBM watsonx AI credentials.
-3. **Launch**:
-   ```bash
-   docker-compose up --build
-   ```
-4. **Access**:
-   - Frontend: `http://localhost`
-   - Backend API: `http://localhost:5000`
-   - Database: `localhost:5433` (on host)
-
-The system will automatically initialize the PostgreSQL database and link all services.
-
-### Environment Variables
-
-#### Backend (.env)
-```env
-# IBM watsonx AI
-WATSONX_API_KEY=your_watsonx_api_key
-WATSONX_PROJECT_ID=your_project_id
-WATSONX_URL=https://us-south.ml.cloud.ibm.com
-
-# IBM Cloud Object Storage
-COS_API_KEY=your_cos_api_key
-COS_INSTANCE_ID=your_instance_id
-COS_ENDPOINT=https://s3.us-south.cloud-object-storage.appdomain.cloud
-COS_BUCKET_NAME=anbu-docs
-
-# GitHub (Optional)
-GITHUB_TOKEN=your_github_personal_access_token
-
-# Flask & Database
-FLASK_ENV=development
-FLASK_DEBUG=True
-DATABASE_URL=postgresql://user:password@localhost:5432/anbu
-SECRET_KEY=your_secret_key
-```
-
-#### Frontend (.env)
-```env
-VITE_API_URL=http://localhost:5000
-```
+Access the application at `http://localhost`.
 
 ---
 
-##  Usage Guide
+## 9. Submission Checklist
 
-### Generating Documentation
-
-1. **Open Anbu** in your web browser
-2. **Paste GitHub URL** of the repository you want to analyze
-   - Example: `https://github.com/facebook/react`
-3. **Click "Generate Documentation"** button
-4. **Wait for analysis** - Progress indicator shows current status
-5. **Review documentation** - Preview generated content in browser
-6. **Download or Share**:
-   - Click "Download" to save as Markdown file
-   - Click "Share" to get a permanent URL
-
-### Supported Repository Types
-
--  JavaScript/TypeScript (React, Vue, Angular, Node.js)
--  Python (Django, Flask, FastAPI)
--  Java (Spring Boot, Maven, Gradle)
--  Go (Go modules)
--  Ruby (Rails, Sinatra)
--  PHP (Laravel, Symfony)
--  And many more...
+• [x] Public repo URL is available.
+• [ ] Demo video URL is available.
+• [x] bob_sessions/ folder exists in the repo root.
+• [x] Bob session summary screenshots are included.
+• [x] Bob exported task-history Markdown files are included.
+• [x] Problem and solution statement is complete.
+• [x] IBM Bob usage is clearly explained.
+• [x] Final code is pushed to the main branch.
 
 ---
 
-##  API Documentation
+## 10. Notes
 
-### POST `/api/analyze`
-
-Analyze a GitHub repository and generate documentation.
-
-**Request:**
-```json
-{
-  "repo_url": "https://github.com/username/repository"
-}
-```
-
-**Response (Success):**
-```json
-{
-  "success": true,
-  "documentation": "# Project Documentation\n\n...",
-  "metadata": {
-    "repo_name": "repository",
-    "owner": "username",
-    "tech_stack": ["JavaScript", "React", "Node.js"],
-    "dependencies_count": 42,
-    "generated_at": "2026-05-01T14:30:00Z"
-  },
-  "share_url": "https://anbu-docs.s3.amazonaws.com/abc123.md"
-}
-```
-
-**Response (Error):**
-```json
-{
-  "success": false,
-  "error": "Invalid repository URL or repository not found"
-}
-```
-
-### GET `/api/health`
-
-Check API health status.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "version": "1.0.0"
-}
-```
-
----
-
-##  Design Philosophy
-
-### User Experience Principles
-
-- **Simplicity First** - One input field, one button, clear results
-- **Instant Feedback** - Real-time progress updates during analysis
-- **Beginner-Friendly** - Documentation written for junior developers
-- **Actionable Content** - Step-by-step instructions, not just descriptions
-- **Professional Design** - Clean, modern interface with IBM branding
-
-### Color Scheme
-
-- **Primary**: IBM Blue (#0f62fe) - Trust and professionalism
-- **Secondary**: Teal (#00bfa5) - Innovation and growth
-- **Background**: Light Gray (#f4f4f4) - Clean and minimal
-- **Text**: Dark Gray (#161616) - High readability
-- **Accent**: Purple (#8a3ffc) - Creativity and AI
-
----
-
-##  Contributing
-
-We welcome contributions! Here's how you can help:
-
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
-4. **Push to the branch** (`git push origin feature/amazing-feature`)
-5. **Open a Pull Request**
-
-### Development Guidelines
-
-- Write clean, documented code
-- Follow existing code style
-- Add tests for new features
-- Update documentation as needed
-
----
-
-##  License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-##  Acknowledgments
-
-- **IBM watsonx AI** - Powerful foundation models for code analysis
-- **IBM Cloud** - Reliable infrastructure and services
-- **GitHub** - Repository hosting and API access
-- **Open Source Community** - Amazing tools and frameworks
-
----
-
-##  Contact & Support
-
-- **Project Repository**: [github.com/chamika-u/Anbu](https://github.com/chamika-u/Anbu)
-- **Issues**: [github.com/chamika-u/Anbu/issues](https://github.com/chamika-u/Anbu/issues)
-- **Email**: your.email@example.com
-
----
-
-##  Project Status
-
-**Current Version**: 1.0.0 (MVP)  
-**Status**: Active Development  
-**Last Updated**: May 3, 2026
-
----
-
-**Built with Anbu for developers, by developers**
-
-*Empowering junior developers to succeed from day one*
+Anbu was built with the vision of making open-source and corporate codebases more accessible. By combining IBM's powerful foundation models with a developer-centric UI, we aim to reduce the "imposter syndrome" often felt by new developers and foster a more inclusive engineering culture.
