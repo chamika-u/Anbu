@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { getHistory, type HistoryAnalysis } from '../services/api';
+import { getHistory, deleteAnalysis, type HistoryAnalysis } from '../services/api';
 
 interface RecentAnalysesProps {
   onSelect: (analysis: HistoryAnalysis) => void;
@@ -23,6 +22,18 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
     };
     fetchHistory();
   }, []);
+
+  const handleDelete = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation(); // Prevent card click
+    if (!window.confirm('Are you sure you want to delete this analysis? This action cannot be undone.')) return;
+    
+    const success = await deleteAnalysis(id);
+    if (success) {
+      setHistory(history.filter(item => item.id !== id));
+    } else {
+      alert('Failed to delete analysis. Please try again.');
+    }
+  };
 
   if (isLoading) {
     return <div className="text-center text-gray-500 mt-12 fade-in">Loading dashboard...</div>;
@@ -176,13 +187,23 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(item.created_at).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <button 
-                          onClick={() => onSelect(item)}
-                          className="text-ibm-blue font-medium hover:text-blue-700 hover:underline text-sm"
-                        >
-                          View Docs
-                        </button>
+                        <div className="flex items-center justify-end gap-3">
+                          <button 
+                            onClick={() => onSelect(item)}
+                            className="text-ibm-blue font-medium hover:text-blue-700 hover:underline text-sm"
+                          >
+                            View Docs
+                          </button>
+                          <button 
+                            onClick={(e) => handleDelete(e, item.id)}
+                            className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-colors"
+                            title="Delete analysis"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -209,9 +230,20 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors">
+                  <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors pr-8">
                     {item.repo_name}
                   </h4>
+                  <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={(e) => handleDelete(e, item.id)}
+                      className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all"
+                      title="Delete analysis"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                   <span className="text-xs font-medium bg-gray-100 text-gray-500 px-2 py-1 rounded-full whitespace-nowrap">
                     {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>

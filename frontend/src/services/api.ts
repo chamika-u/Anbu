@@ -323,6 +323,17 @@ export const saveAnalysis = async (repoUrl: string, owner: string, repoName: str
   }
 };
 
+/** Delete an analysis record */
+export const deleteAnalysis = async (analysisId: number): Promise<boolean> => {
+  try {
+    const response = await api.delete(`/api/history/${analysisId}`);
+    return response.data.success;
+  } catch (error) {
+    console.error('Failed to delete analysis:', error);
+    return false;
+  }
+};
+
 export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await api.post<AuthResponse>('/api/auth/login', { email, password });

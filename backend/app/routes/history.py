@@ -96,3 +96,21 @@ def save_analysis(user):
         print(f"[History] Error saving analysis: {e}")
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/<int:analysis_id>', methods=['DELETE'])
+@require_auth
+def delete_analysis(user, analysis_id):
+    """Delete an analysis record."""
+    try:
+        analysis = RepositoryAnalysis.query.get_or_404(analysis_id)
+        if analysis.user_id != user.id:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+            
+        db.session.delete(analysis)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Analysis deleted successfully'}), 200
+    except Exception as e:
+        print(f"[History] Error deleting analysis {analysis_id}: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
