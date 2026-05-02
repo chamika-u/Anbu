@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import RepositoryInput from './components/RepositoryInput';
@@ -36,7 +36,6 @@ function App() {
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0]);
   const [toast, setToast] = useState<ToastState | null>(null);
   const { user, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
 
   const showToast = useCallback((message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type });
@@ -104,9 +103,9 @@ function App() {
     const opt = {
       margin:       10,
       filename:     `${repoName}-onboarding.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
+      image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
     };
     
     html2pdf().from(element).set(opt).save().then(() => {
@@ -130,11 +129,11 @@ function App() {
 
   const [isSaving, setIsSaving] = useState(false);
   const handleSaveToDashboard = async () => {
-    if (!result || !user) return;
+    if (!result || !user || !result.documentation || !result.metadata) return;
     setIsSaving(true);
     try {
-      const owner = (result.metadata as RepoMetadata).owner || 'unknown';
-      const repoName = (result.metadata as RepoMetadata).repo_name || 'unknown';
+      const owner = result.metadata.owner || 'unknown';
+      const repoName = result.metadata.repo_name || 'unknown';
       const res = await saveAnalysis(result.share_url || '', owner, repoName, result.documentation, result.metadata);
       
       setResult({

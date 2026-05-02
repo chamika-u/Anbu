@@ -50,6 +50,7 @@ export interface ChecklistTask {
 }
 
 export interface RepoMetadata {
+  id?: number;
   repo_name: string;
   owner: string;
   tech_stack: string[];
@@ -57,6 +58,7 @@ export interface RepoMetadata {
   generated_at: string;
   ai_generated?: boolean;
   checklist?: ChecklistTask[];
+  progress?: Record<string, boolean>;
 }
 
 export interface AnalyzeResponse {
