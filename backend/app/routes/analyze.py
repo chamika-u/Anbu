@@ -5,6 +5,7 @@ import re
 import json
 from datetime import datetime
 import urllib3
+import time
 
 from app import db
 from app.models.analysis import RepositoryAnalysis
@@ -339,6 +340,40 @@ def analyze_repository():
                     return
 
                 yield f"data: {json.dumps({'status': 'progress', 'message': 'Analysing project structure and dependencies...'})}\n\n"
+                
+                # Provide specific progress updates based on repo contents
+                tree = repo_info.get('tree', [])
+                top_dirs = set()
+                files = []
+                for item in tree:
+                    path = item.get('path', '')
+                    parts = path.split('/')
+                    if len(parts) > 1:
+                        top_dirs.add(parts[0].lower())
+                    if item.get('type') != 'tree':
+                        files.append(path.split('/')[-1].lower())
+                        
+                if any(d in top_dirs for d in ['frontend', 'client', 'ui', 'web', 'app']):
+                    yield f"data: {json.dumps({'status': 'progress', 'message': f'Analysing frontend components for {repo}...'})}\n\n"
+                    time.sleep(0.6)
+                    
+                if any(d in top_dirs for d in ['backend', 'server', 'api']):
+                    yield f"data: {json.dumps({'status': 'progress', 'message': f'Analysing backend services for {repo}...'})}\n\n"
+                    time.sleep(0.6)
+                    
+                if any(f in files for f in ['package.json', 'requirements.txt', 'pom.xml', 'go.mod', 'cargo.toml']):
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Resolving package dependencies...'})}\n\n"
+                    time.sleep(0.6)
+                    
+                if any(f in files for f in ['docker-compose.yml', 'docker-compose.yaml', 'dockerfile']):
+                    yield f"data: {json.dumps({'status': 'progress', 'message': 'Inspecting containerization configs...'})}\n\n"
+                    time.sleep(0.6)
+                    
+                languages = repo_info.get('languages', [])
+                if languages:
+                    langs_str = ", ".join(languages[:3])
+                    yield f"data: {json.dumps({'status': 'progress', 'message': f'Processing {langs_str} ecosystem...'})}\n\n"
+                    time.sleep(0.6)
 
                 # Try AI generation
                 watsonx_service = get_watsonx_service()
