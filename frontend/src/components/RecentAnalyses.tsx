@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { getHistory, deleteAnalysis, type HistoryAnalysis } from '../services/api';
 
 interface RecentAnalysesProps {
@@ -46,7 +47,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
       <div className="mb-12">
         <h3 className="text-xl font-bold text-ibm-gray mb-6 flex items-center gap-2">
           <svg className="w-5 h-5 text-ibm-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
           Analytics Overview
         </h3>
@@ -187,6 +188,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(item.created_at).toLocaleDateString()}
                       </td>
+                      <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3">
                           <button 
                             onClick={() => onSelect(item)}
@@ -227,7 +229,7 @@ const RecentAnalyses: React.FC<RecentAnalysesProps> = ({ onSelect }) => {
               <div 
                 key={item.id}
                 onClick={() => onSelect(item)}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group"
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-ibm-blue transition-all cursor-pointer group relative"
               >
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-ibm-gray text-lg truncate group-hover:text-ibm-blue transition-colors pr-8">
