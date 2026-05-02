@@ -48,120 +48,108 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
     setValidationError('');
   };
 
+  const handleClear = () => {
+    setRepoUrl('');
+    setValidationError('');
+  };
+
   const hasError = Boolean(validationError);
 
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div>
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <label
             htmlFor="repo-url"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3"
           >
-            GitHub Repository URL
+            Enter Repository URL
           </label>
 
-          <div className="flex gap-2">
-            <input
-              id="repo-url"
-              type="url"
-              value={repoUrl}
-              onChange={handleChange}
-              placeholder="https://github.com/username/repository"
-              aria-invalid={hasError}
-              aria-describedby={hasError ? 'repo-url-error' : undefined}
-              className={[
-                'flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-shadow text-sm',
-                hasError
-                  ? 'border-red-400 focus:ring-red-400 bg-red-50'
-                  : 'border-gray-300 focus:ring-ibm-blue focus:border-ibm-blue bg-white',
-                isLoading ? 'opacity-60 cursor-not-allowed' : '',
-              ].join(' ')}
-              disabled={isLoading}
-              autoComplete="url"
-            />
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1 group">
+              <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors ${hasError ? 'text-red-400' : 'text-gray-400 group-focus-within:text-ibm-blue'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <input
+                id="repo-url"
+                type="url"
+                value={repoUrl}
+                onChange={handleChange}
+                placeholder="https://github.com/username/repository"
+                aria-invalid={hasError}
+                aria-describedby={hasError ? 'repo-url-error' : undefined}
+                className={`w-full pl-12 pr-12 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-sm font-medium ${
+                  hasError
+                    ? 'border-red-200 focus:ring-red-100 bg-red-50 text-red-900 placeholder-red-300'
+                    : 'border-gray-200 focus:ring-blue-50 focus:border-ibm-blue bg-gray-50/50 hover:bg-gray-50'
+                } ${isLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                disabled={isLoading}
+                autoComplete="url"
+              />
+              {repoUrl && !isLoading && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="absolute inset-y-0 right-4 flex items-center text-gray-300 hover:text-gray-500 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
 
             <button
               type="submit"
               id="analyze-btn"
-              disabled={isLoading}
-              className={[
-                'px-7 py-3 rounded-xl font-semibold text-white text-sm transition-all whitespace-nowrap',
-                isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-ibm-blue hover:bg-blue-700 active:scale-95 hover:shadow-lg',
-              ].join(' ')}
+              disabled={isLoading || !repoUrl.trim()}
+              className={`px-8 py-3.5 rounded-xl font-bold text-white text-sm transition-all whitespace-nowrap shadow-sm active:scale-[0.98] ${
+                isLoading || !repoUrl.trim()
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                  : 'bg-ibm-blue hover:bg-blue-700 hover:shadow-blue-200 hover:shadow-lg'
+              }`}
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Analysing…
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                  Analyzing...
                 </span>
               ) : (
-                'Generate Docs'
+                'Generate Documentation'
               )}
             </button>
           </div>
 
           {/* Inline validation error */}
           {hasError && (
-            <p
-              id="repo-url-error"
-              className="mt-2 text-sm text-red-600 flex items-center gap-1"
-              role="alert"
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+            <p id="repo-url-error" className="mt-3 text-xs font-bold text-red-500 flex items-center gap-1.5 animate-pulse" role="alert">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
               {validationError}
             </p>
           )}
 
           {/* Private repo access indicator */}
-          {hasGitHubToken ? (
-            <p className="mt-2 text-xs text-green-600 flex items-center gap-1.5 font-medium">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Private repository access enabled
-            </p>
-          ) : (
-            <p className="mt-2 text-xs text-gray-400 flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-              </svg>
-              Only public repositories supported. Log in and add a GitHub token for private repos.
-            </p>
+          {!hasError && (
+            hasGitHubToken ? (
+              <p className="mt-3 text-[11px] text-green-600 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                Private Access Active
+              </p>
+            ) : (
+              <p className="mt-3 text-[11px] text-gray-400 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+                Public Only (Add token for private)
+              </p>
+            )
           )}
         </div>
 
-        {/* Example repositories */}
-        <div className="pt-1">
-          <p className="text-sm text-gray-500 mb-2">Try an example:</p>
+        {/* Examples section */}
+        <div className="flex flex-col md:flex-row md:items-center gap-4 px-2">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex-shrink-0">Quick Start:</span>
           <div className="flex flex-wrap gap-2">
             {EXAMPLE_REPOS.map((url) => (
               <button
@@ -169,9 +157,9 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
                 type="button"
                 onClick={() => handleExampleClick(url)}
                 disabled={isLoading}
-                className="px-3 py-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3.5 py-1.5 text-xs font-bold bg-white border border-gray-100 hover:border-ibm-blue hover:text-ibm-blue text-gray-500 rounded-full transition-all shadow-sm active:scale-95 disabled:opacity-50"
               >
-                {url.split('/').slice(-2).join('/')}
+                {url.split('/').slice(-1)[0]}
               </button>
             ))}
           </div>
@@ -179,30 +167,29 @@ const RepositoryInput: React.FC<RepositoryInputProps> = ({ onSubmit, isLoading, 
       </form>
 
       {/* Info panel */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-        <div className="flex items-start gap-3">
-          <svg
-            className="w-5 h-5 text-ibm-blue mt-0.5 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="text-sm text-gray-700">
-            <p className="font-semibold mb-1">How it works</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-600">
-              <li>Paste any public GitHub repository URL above</li>
-              <li>Log in and add a GitHub token to access <strong>private repos</strong></li>
-              <li>Our AI analyses the codebase structure and dependencies</li>
-              <li>Get comprehensive onboarding documentation in minutes</li>
-              <li>Download as Markdown or share with your team</li>
-            </ul>
+      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white/40 border border-gray-100 rounded-2xl p-5 hover:bg-white hover:shadow-sm transition-all group">
+          <div className="w-10 h-10 bg-blue-50 text-ibm-blue rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
           </div>
+          <h4 className="text-sm font-bold text-ibm-gray mb-1.5">Deep Analysis</h4>
+          <p className="text-xs text-gray-500 leading-relaxed">Our AI scans code structure, logic, and dependencies to build context.</p>
+        </div>
+
+        <div className="bg-white/40 border border-gray-100 rounded-2xl p-5 hover:bg-white hover:shadow-sm transition-all group">
+          <div className="w-10 h-10 bg-purple-50 text-ibm-purple rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          </div>
+          <h4 className="text-sm font-bold text-ibm-gray mb-1.5">Auto Documentation</h4>
+          <p className="text-xs text-gray-500 leading-relaxed">Generates comprehensive guides, tech stack maps, and setup checklists.</p>
+        </div>
+
+        <div className="bg-white/40 border border-gray-100 rounded-2xl p-5 hover:bg-white hover:shadow-sm transition-all group">
+          <div className="w-10 h-10 bg-teal-50 text-ibm-teal rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </div>
+          <h4 className="text-sm font-bold text-ibm-gray mb-1.5">Interactive Checklist</h4>
+          <p className="text-xs text-gray-500 leading-relaxed">Keep track of your setup progress with persistent, per-repo checklists.</p>
         </div>
       </div>
     </div>
