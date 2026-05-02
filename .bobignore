@@ -2,6 +2,8 @@
 # Files and directories that Bob should not analyze or modify
 
 # Environment Variables & Secrets
+.env
+**/.env
 
 # Dependencies
 node_modules/
