@@ -116,6 +116,17 @@ function App() {
     });
   };
 
+  const handleProgressChange = (progress: Record<string, boolean>) => {
+    if (!result || !result.metadata) return;
+    setResult({
+      ...result,
+      metadata: {
+        ...result.metadata,
+        progress
+      }
+    });
+  };
+
   const handleCopyShareUrl = async () => {
     const shareUrl = result?.share_url;
     if (!shareUrl) return showToast('No share URL available.', 'error');
@@ -134,14 +145,31 @@ function App() {
     try {
       const owner = result.metadata.owner || 'unknown';
       const repoName = result.metadata.repo_name || 'unknown';
-      const res = await saveAnalysis(result.share_url || '', owner, repoName, result.documentation, result.metadata);
+      
+      // Get current progress from localStorage before saving
+      let currentProgress = {};
+      const saved = localStorage.getItem(`anbu_tasks_${repoName}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            const progressObj: Record<string, boolean> = {};
+            result.metadata.checklist?.forEach(t => progressObj[t.id] = parsed.includes(t.id));
+            currentProgress = progressObj;
+          }
+        } catch (e) {
+          console.error('Failed to parse progress before save', e);
+        }
+      }
+
+      const res = await saveAnalysis(result.share_url || '', owner, repoName, result.documentation, result.metadata, currentProgress);
       
       setResult({
         ...result,
         metadata: {
           ...result.metadata,
           id: res.id,
-          progress: {}
+          progress: currentProgress
         }
       });
       showToast('Saved to your Dashboard!', 'success');
@@ -305,6 +333,7 @@ function App() {
               onDownload={handleDownload}
               onDownloadPdf={handleDownloadPdf}
               onCopyShareUrl={handleCopyShareUrl}
+              onProgressChange={handleProgressChange}
             />
           </div>
         )}

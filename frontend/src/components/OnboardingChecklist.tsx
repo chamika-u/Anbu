@@ -6,9 +6,10 @@ interface OnboardingChecklistProps {
   tasks: ChecklistTask[];
   analysisId?: number;
   initialProgress?: Record<string, boolean>;
+  onProgressChange?: (progress: Record<string, boolean>) => void;
 }
 
-const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tasks, analysisId, initialProgress }) => {
+const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tasks, analysisId, initialProgress, onProgressChange }) => {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
   const [isClient, setIsClient] = useState(false);
 
@@ -55,10 +56,15 @@ const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tas
     localStorage.setItem(storageKey, JSON.stringify(nextArr));
 
     // Save to backend if analysisId is available
+    const progressObj: Record<string, boolean> = {};
+    tasks.forEach(t => progressObj[t.id] = next.has(t.id));
+    
     if (analysisId) {
-      const progressObj: Record<string, boolean> = {};
-      tasks.forEach(t => progressObj[t.id] = next.has(t.id));
       updateProgress(analysisId, progressObj);
+    }
+
+    if (onProgressChange) {
+      onProgressChange(progressObj);
     }
   };
 

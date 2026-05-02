@@ -70,6 +70,7 @@ def save_analysis(user):
         repo_name = data.get('repo_name')
         documentation = data.get('documentation')
         metadata = data.get('metadata')
+        progress = data.get('progress', {})
         
         if not all([repo_url, owner, repo_name, documentation, metadata]):
             return jsonify({'success': False, 'error': 'Missing required fields'}), 400
@@ -82,7 +83,7 @@ def save_analysis(user):
             documentation=documentation,
             metadata_json=json.dumps(metadata),
             user_id=user.id,
-            progress_json="{}"
+            progress_json=json.dumps(progress)
         )
         db.session.add(analysis_record)
         db.session.commit()

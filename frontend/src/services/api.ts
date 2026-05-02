@@ -304,14 +304,15 @@ export const updateProgress = async (analysisId: number, progress: Record<string
 };
 
 /** Save a newly generated analysis to the dashboard */
-export const saveAnalysis = async (repoUrl: string, owner: string, repoName: string, documentation: string, metadata: RepoMetadata): Promise<{ id: number }> => {
+export const saveAnalysis = async (repoUrl: string, owner: string, repoName: string, documentation: string, metadata: RepoMetadata, progress: Record<string, boolean> = {}): Promise<{ id: number }> => {
   try {
     const response = await api.post('/api/history/save', {
       repo_url: repoUrl,
       owner,
       repo_name: repoName,
       documentation,
-      metadata
+      metadata,
+      progress
     });
     if (!response.data.success) {
       throw new Error(response.data.error || 'Failed to save analysis');

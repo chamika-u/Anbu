@@ -12,6 +12,7 @@ interface DocumentationViewerProps {
   onDownload: () => void;
   onDownloadPdf?: () => void;
   onCopyShareUrl: () => void;
+  onProgressChange?: (progress: Record<string, boolean>) => void;
 }
 
 const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
@@ -21,6 +22,7 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
   onDownload,
   onDownloadPdf,
   onCopyShareUrl,
+  onProgressChange,
 }) => {
   const [activeTab, setActiveTab] = useState<'rendered' | 'raw'>('rendered');
 
@@ -118,6 +120,7 @@ const DocumentationViewer: React.FC<DocumentationViewerProps> = ({
           tasks={metadata.checklist} 
           analysisId={(metadata as any).id}
           initialProgress={(metadata as any).progress}
+          onProgressChange={onProgressChange}
         />
       )}
 
