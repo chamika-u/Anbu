@@ -21,11 +21,13 @@ interface ToastState {
 }
 
 const LOADING_MESSAGES = [
-  'Establishing connection…',
-  'Syncing source tree…',
-  'Analyzing architecture…',
-  'Generating intelligence…',
-  'Finalizing documentation…',
+  'Connecting to GitHub…',
+  'Fetching repository data…',
+  'Analysing project structure…',
+  'Detecting tech stack…',
+  'Processing dependencies…',
+  'Generating documentation with IBM watsonx AI…',
+  'Finalising documentation…',
 ];
 
 function App() {
@@ -46,7 +48,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     setResult(null);
-    setLoadingMessage('Initializing analysis engine...');
+    setLoadingMessage('Initializing...');
 
     try {
       const response = await analyzeRepository(repoUrl, (msg) => {
@@ -89,12 +91,12 @@ function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('Markdown downloaded successfully.', 'success');
+    showToast('Documentation downloaded as Markdown!', 'success');
   };
 
   const handleDownloadPdf = () => {
     if (!result?.documentation) return;
-    showToast('Preparing document export...', 'info');
+    showToast('Generating PDF... this may take a moment.', 'info');
     const repoName = (result.metadata as RepoMetadata | undefined)?.repo_name ?? 'documentation';
     const element = document.getElementById('documentation-pdf-content');
     if (!element) return;
@@ -108,9 +110,9 @@ function App() {
     };
     
     html2pdf().from(element).set(opt).save().then(() => {
-      showToast('PDF exported successfully.', 'success');
+      showToast('Documentation downloaded as PDF!', 'success');
     }).catch((err: any) => {
-      showToast('Export failed.', 'error');
+      showToast('Failed to generate PDF.', 'error');
       console.error(err);
     });
   };
@@ -128,12 +130,12 @@ function App() {
 
   const handleCopyShareUrl = async () => {
     const shareUrl = result?.share_url;
-    if (!shareUrl) return showToast('No URL available.', 'error');
+    if (!shareUrl) return showToast('No share URL available.', 'error');
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showToast('Share link copied.', 'success');
+      showToast('Share URL copied to clipboard!', 'success');
     } catch {
-      showToast(`Link: ${shareUrl}`, 'info');
+      showToast(`Share URL: ${shareUrl}`, 'info');
     }
   };
 
@@ -145,6 +147,7 @@ function App() {
       const owner = result.metadata.owner || 'unknown';
       const repoName = result.metadata.repo_name || 'unknown';
       
+      // Get current progress from localStorage before saving
       let currentProgress = {};
       const saved = localStorage.getItem(`anbu_tasks_${repoName}`);
       if (saved) {
@@ -156,7 +159,7 @@ function App() {
             currentProgress = progressObj;
           }
         } catch (e) {
-          console.error('Failed to parse progress', e);
+          console.error('Failed to parse progress before save', e);
         }
       }
 
@@ -170,9 +173,9 @@ function App() {
           progress: currentProgress
         }
       });
-      showToast('Saved to your dashboard.', 'success');
+      showToast('Saved to your Dashboard!', 'success');
     } catch (err: any) {
-      showToast(err.message || 'Failed to save.', 'error');
+      showToast(err.message || 'Failed to save', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -188,23 +191,19 @@ function App() {
   if (authLoading) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-slate-900 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-ibm-light">
       <Header />
 
-      <main className="flex-grow container mx-auto px-6 py-12 md:py-20">
+      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         {error && (
-          <div className="max-w-4xl mx-auto mb-12 fade-in" role="alert">
-            <div className="bg-white border-l-4 border-red-500 rounded-2xl p-6 shadow-xl shadow-red-500/5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                  </div>
-                  <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">{error}</p>
+          <div className="max-w-4xl mx-auto mb-8 fade-in" role="alert" aria-live="assertive">
+            <div className="bg-red-50 border border-red-300 rounded-xl p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-red-800 font-semibold text-sm mb-0.5">Something went wrong</h3>
+                  <p className="text-red-700 text-sm break-words">{error}</p>
                 </div>
-                <button onClick={dismissError} className="text-slate-300 hover:text-slate-900 transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                <button onClick={dismissError} className="flex-shrink-0 text-red-500 hover:text-red-700 p-1">✕</button>
               </div>
             </div>
           </div>
@@ -213,56 +212,63 @@ function App() {
         <Routes>
           <Route path="/" element={
             !result && !isLoading ? (
-              <div className="space-y-32">
-                <div className="text-center space-y-8 fade-in">
-                  <div className="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20">
-                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                    AI Intelligence Suite
-                  </div>
-                  <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-none">
-                    Engineering <br/><span className="text-slate-400">Onboarding.</span>
+              <>
+                <div className="text-center mb-12 fade-in">
+                  <h1 className="text-4xl md:text-5xl font-bold text-ibm-gray mb-4">
+                    AI-Powered Developer Onboarding
                   </h1>
-                  <p className="text-xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                    Transform complex repositories into actionable intelligence. <br className="hidden md:block"/>
-                    Powered by <span className="text-slate-900 font-bold">IBM watsonx AI</span> for unparalleled precision.
+                  <p className="text-xl text-gray-600 mb-2">
+                    Generate comprehensive documentation for any GitHub repository
                   </p>
-                  <div className="pt-8">
-                    <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} />
-                  </div>
+                  <p className="text-lg text-ibm-blue font-semibold">
+                    Powered by IBM watsonx AI
+                  </p>
+                </div>
+                <div className="fade-in">
+                  <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
-                  <div className="space-y-4">
-                    <div className="w-14 h-14 bg-white border border-slate-100 rounded-[1.25rem] flex items-center justify-center shadow-sm">
-                      <svg className="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto fade-in">
+                  {/* Card 1 */}
+                  <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
+                    <div className="w-12 h-12 bg-ibm-blue rounded-xl flex items-center justify-center mb-4">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">Instant Clarity</h3>
-                    <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                      Zero delay in knowledge transfer. We map dependencies and architecture in real-time.
+                    <h3 className="text-xl font-semibold text-ibm-gray mb-2">Lightning Fast</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Generate comprehensive documentation in minutes, not hours. Powered by IBM watsonx AI.
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="w-14 h-14 bg-white border border-slate-100 rounded-[1.25rem] flex items-center justify-center shadow-sm">
-                      <svg className="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {/* Card 2 */}
+                  <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
+                    <div className="w-12 h-12 bg-ibm-teal rounded-xl flex items-center justify-center mb-4">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">Checklist Engine</h3>
-                    <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                      Dynamic onboarding paths tailored to your specific tech stack and project needs.
+                    <h3 className="text-xl font-semibold text-ibm-gray mb-2">Beginner Friendly</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Documentation written specifically for junior developers joining your team.
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="w-14 h-14 bg-white border border-slate-100 rounded-[1.25rem] flex items-center justify-center shadow-sm">
-                      <svg className="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  {/* Card 3 */}
+                  <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
+                    <div className="w-12 h-12 bg-ibm-purple rounded-xl flex items-center justify-center mb-4">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">Collaborative</h3>
-                    <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                      Share insights with the whole team via secure links and PDF exports.
+                    <h3 className="text-xl font-semibold text-ibm-gray mb-2">Easy Sharing</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Download as Markdown or copy a share link to distribute with your entire team.
                     </p>
                   </div>
                 </div>
-              </div>
+              </>
             ) : null
           } />
 
@@ -273,58 +279,55 @@ function App() {
           <Route path="/dashboard" element={
             !user ? <Navigate to="/login" /> : (
               !result && !isLoading ? (
-                <div className="fade-in space-y-12">
-                  <div className="space-y-2">
-                    <h2 className="text-4xl font-black text-slate-900 tracking-tight">Intelligence Dashboard</h2>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Managing {user.email}</p>
-                  </div>
-                  <GitHubTokenManager
-                    hasToken={user.has_github_token ?? false}
-                    onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
-                  />
-                  <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/40">
-                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 pl-1">Gather New Intelligence</h3>
+                <>
+                  <div className="fade-in mb-6">
+                    <h2 className="text-3xl font-bold text-ibm-gray mb-6">Your Dashboard</h2>
+                    <GitHubTokenManager
+                      hasToken={user.has_github_token ?? false}
+                      onTokenChange={(hasToken) => updateUser({ ...user, has_github_token: hasToken })}
+                    />
                     <RepositoryInput onSubmit={handleAnalyze} isLoading={isLoading} hasGitHubToken={user.has_github_token ?? false} />
                   </div>
                   <RecentAnalyses onSelect={handleSelectHistory} />
-                </div>
+                </>
               ) : null
             )
           } />
         </Routes>
 
         {isLoading && (
-          <div className="max-w-2xl mx-auto fade-in mt-12">
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-16 border border-slate-100">
+          <div className="max-w-2xl mx-auto fade-in mt-8">
+            <div className="bg-white rounded-2xl shadow-lg p-10">
               <LoadingSpinner message={loadingMessage} size="large" />
             </div>
           </div>
         )}
 
         {result?.documentation && (
-          <div className="fade-in space-y-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 no-print">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-100 px-2 py-1 rounded-md">
-                  Analysis Result
-                </span>
-              </div>
-              <div className="flex gap-4">
+          <div className="fade-in">
+            <div className="mb-6 flex flex-wrap justify-between items-center gap-4">
+              <h2 className="text-2xl font-bold text-ibm-gray">Generated Documentation</h2>
+              <div className="flex gap-3">
                 {user && !(result.metadata as any).id && (
                   <button
                     onClick={handleSaveToDashboard}
                     disabled={isSaving}
-                    className="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-30"
+                    className="flex items-center gap-2 px-4 py-2 bg-ibm-teal text-white rounded-lg font-medium hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-70"
                   >
-                    {isSaving ? 'Preserving Intelligence...' : 'Save to Intelligence Suite'}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    {isSaving ? 'Saving...' : 'Save to Dashboard'}
                   </button>
                 )}
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-900 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm"
+                  className="flex items-center gap-2 px-4 py-2 text-ibm-blue hover:bg-blue-50 border border-ibm-blue rounded-lg font-medium transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                  {user ? 'Return to Dashboard' : 'New Analysis'}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  {user ? 'Back to Dashboard' : 'Analyse Another Repository'}
                 </button>
               </div>
             </div>
@@ -339,6 +342,7 @@ function App() {
             />
           </div>
         )}
+
       </main>
 
       <Footer />
@@ -351,4 +355,3 @@ function App() {
 }
 
 export default App;
-
