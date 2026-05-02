@@ -3,31 +3,39 @@ import React from 'react';
 const LoadingSpinner: React.FC<{
   message?: string;
   size?: 'small' | 'medium' | 'large';
-}> = ({ message = 'Loading…', size = 'medium' }) => {
+}> = ({ message = 'Gathering intelligence…', size = 'medium' }) => {
   const sizeClass = {
     small:  'w-8 h-8',
-    medium: 'w-12 h-12',
-    large:  'w-16 h-16',
+    medium: 'w-16 h-16',
+    large:  'w-24 h-24',
   }[size];
 
   return (
-    <div className="flex flex-col items-center justify-center py-8" role="status" aria-live="polite">
-      <div className={`${sizeClass} relative`} aria-hidden="true">
-        {/* Track */}
-        <div className="absolute inset-0 border-4 border-gray-200 rounded-full" />
-        {/* Spinner */}
-        <div className="absolute inset-0 border-4 border-ibm-blue border-t-transparent rounded-full animate-spin" />
+    <div className="flex flex-col items-center justify-center py-12" role="status">
+      <div className={`${sizeClass} relative`}>
+        {/* Outer Ring */}
+        <div className="absolute inset-0 border-[3px] border-slate-100 rounded-[30%] animate-[spin_3s_linear_infinite]" />
+        {/* Middle Ring */}
+        <div className="absolute inset-2 border-[3px] border-slate-200 rounded-[35%] animate-[spin_2s_linear_infinite_reverse]" />
+        {/* Core */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping" />
+        </div>
       </div>
 
       {message && (
-        <p className="mt-4 text-gray-600 text-center text-sm animate-pulse">
-          {message}
-        </p>
+        <div className="mt-8 space-y-1 text-center">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">
+            Neural Processing
+          </p>
+          <p className="text-sm font-bold text-slate-900 tracking-tight">
+            {message}
+          </p>
+        </div>
       )}
-
-      <span className="sr-only">{message || 'Loading'}</span>
     </div>
   );
 };
 
 export default LoadingSpinner;
+
