@@ -11,7 +11,9 @@ def chat():
         watsonx_service = get_watsonx_service()
         default_service = get_default_ai_service()
         
-        data = request.get_json()
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({'error': 'Request body must be JSON.'}), 400
         message = data.get('message')
         conversation_id = data.get('conversation_id')
         model_id = data.get('model_id')
