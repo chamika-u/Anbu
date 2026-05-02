@@ -387,6 +387,7 @@ def analyze_repository():
             db.session.commit()
             print(f"[Analyze] Saved analysis to database with ID: {analysis_record.id}")
             metadata['id'] = analysis_record.id
+            metadata['progress'] = {}
         except Exception as db_err:
             print(f"[Analyze] Database save error: {db_err}")
             db.session.rollback()

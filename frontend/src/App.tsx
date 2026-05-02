@@ -71,7 +71,11 @@ function App() {
     setResult({
       success: true,
       documentation: historyItem.documentation,
-      metadata: historyItem.metadata,
+      metadata: {
+        ...historyItem.metadata,
+        id: historyItem.id,
+        progress: historyItem.progress
+      },
       share_url: `https://github.com/${historyItem.owner}/${historyItem.repo_name}`,
       using_watsonx: historyItem.metadata.ai_generated,
     });
@@ -228,9 +232,12 @@ function App() {
               <h2 className="text-2xl font-bold text-ibm-gray">Generated Documentation</h2>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-2 px-4 py-2 text-ibm-blue hover:bg-blue-50 border border-ibm-blue rounded-lg font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-ibm-blue hover:bg-blue-50 border border-ibm-blue rounded-lg font-medium transition-colors"
               >
-                Analyse Another Repository
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                {user ? 'Back to Dashboard' : 'Analyse Another Repository'}
               </button>
             </div>
             <DocumentationViewer
