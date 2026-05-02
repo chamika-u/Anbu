@@ -158,62 +158,7 @@ Write the documentation in Markdown. Include the following sections:
 Make every section actionable, beginner-friendly, and use examples where helpful."""
 
 
-def generate_deterministic_mermaid(repo_name: str, tree: list) -> str:
-    """Generate a Mermaid diagram based on the actual repository root contents."""
-    if not tree:
-        return "graph LR\n    A[Repository] --> B[Empty]"
-        
-    lines = ["graph LR", f'    Root["📦 {repo_name}"]']
-    lines.append('    style Root fill:#161616,color:#ffffff,stroke:#161616,stroke-width:2px,rx:10,ry:10')
-    
-    ignore_dirs = {'node_modules', 'venv', '.git', '.github', 'dist', 'build', '__pycache__', '.next'}
-    
-    # Filter and sort paths
-    paths = []
-    for item in tree:
-        path = item.get('path', '')
-        parts = path.split('/')
-        if any(part in ignore_dirs or part.startswith('.') and len(part) > 1 for part in parts):
-            continue
-        paths.append((path, item.get('type') == 'tree'))
-        
-    # Process folders first, then files
-    paths.sort(key=lambda x: (not x[1], x[0].lower()))
-    
-    MAX_NODES = 40
-    node_count = 0
-    added_nodes = {'': 'Root'}
-    
-    for path, is_dir in paths:
-        if node_count >= MAX_NODES:
-            break
-            
-        parts = path.split('/')
-        parent_path = '/'.join(parts[:-1])
-        name = parts[-1]
-        
-        # If parent isn't in graph (e.g. skipped by limits), skip this
-        if parent_path not in added_nodes:
-            continue
-            
-        parent_id = added_nodes[parent_path]
-        node_id = f"node_{node_count}"
-        added_nodes[path] = node_id
-        
-        if is_dir:
-            lines.append(f'    {parent_id} --> {node_id}["📁 {name}"]')
-            lines.append(f'    style {node_id} fill:#f0f4ff,stroke:#0f62fe,stroke-width:2px')
-        else:
-            lines.append(f'    {parent_id} --> {node_id}["📄 {name}"]')
-            lines.append(f'    style {node_id} fill:#ffffff,stroke:#8d8d8d,stroke-width:1px')
-            
-        node_count += 1
-            
-    if len(paths) > MAX_NODES:
-        lines.append(f'    Root -.-> More["... and {len(paths) - MAX_NODES} more items hidden"]')
-        lines.append(f'    style More fill:#f4f4f4,stroke:#e0e0e0,stroke-dasharray: 5 5')
-    
-    return "\n".join(lines)
+# Mermaid generation is now handled by DefaultAIService
 
 
 # Fallback documentation is now handled by DefaultAIService
