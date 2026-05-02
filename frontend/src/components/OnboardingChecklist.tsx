@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import type { ChecklistTask } from '../services/api';
+import { updateProgress, type ChecklistTask } from '../services/api';
 
 interface OnboardingChecklistProps {
   repoName: string;
   tasks: ChecklistTask[];
+  analysisId?: number;
+  initialProgress?: Record<string, boolean>;
 }
 
-const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tasks }) => {
+const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tasks, analysisId, initialProgress }) => {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
   const [isClient, setIsClient] = useState(false);
 
-  // Load saved progress from localStorage on mount
+  // Load saved progress
   useEffect(() => {
     setIsClient(true);
+    
+    // If backend progress is provided, use it
+    if (initialProgress && Object.keys(initialProgress).length > 0) {
+      const activeTaskIds = Object.entries(initialProgress)
+        .filter(([_, isActive]) => isActive)
+        .map(([id]) => id);
+      setCompletedTasks(new Set(activeTaskIds));
+      return;
+    }
+
+    // Fallback to localStorage
     const storageKey = `anbu_tasks_${repoName}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
@@ -23,7 +36,7 @@ const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tas
         console.error('Failed to parse saved checklist', e);
       }
     }
-  }, [repoName]);
+  }, [repoName, initialProgress]);
 
   // Handle toggling a task
   const toggleTask = (taskId: string) => {
@@ -35,8 +48,18 @@ const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ repoName, tas
     }
     
     setCompletedTasks(next);
+    
+    // Save to localStorage
+    const nextArr = Array.from(next);
     const storageKey = `anbu_tasks_${repoName}`;
-    localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
+    localStorage.setItem(storageKey, JSON.stringify(nextArr));
+
+    // Save to backend if analysisId is available
+    if (analysisId) {
+      const progressObj: Record<string, boolean> = {};
+      tasks.forEach(t => progressObj[t.id] = next.has(t.id));
+      updateProgress(analysisId, progressObj);
+    }
   };
 
   const progressPercentage = tasks.length > 0 
