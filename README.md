@@ -84,48 +84,75 @@ Each Bob task includes:
 ### Bob Session Entries
 
 #### Task 1: PostgreSQL Migration
+
 • Description: Migrated the application from local file storage to a professional PostgreSQL database.
+
 • Summary Screenshot: [bob_sessions/task-01_summary.png](./bob_sessions/task-01_summary.png)
+
 • Exported History: [bob_sessions/task-01_history.md](./bob_sessions/task-01_history.md)
 
 #### Task 2: Architecture Running
+
 • Description: Verified the project architecture and service connectivity using Docker.
+
 • Summary Screenshot: [bob_sessions/task-02_summary.png](./bob_sessions/task-02_summary.png)
+
 • Exported History: [bob_sessions/task-02_history.md](./bob_sessions/task-02_history.md)
 
 #### Task 3: Onboarding Dashboard
+
 • Description: Developed the user-linked progress tracking and history dashboard.
+
 • Summary Screenshot: [bob_sessions/task-03_summary.png](./bob_sessions/task-03_summary.png)
+
 • Exported History: [bob_sessions/task-03_history.md](./bob_sessions/task-03_history.md)
 
 #### Task 4: Real-Time Sync
+
 • Description: Implemented bi-directional synchronization between the UI and database.
+
 • Summary Screenshot: [bob_sessions/task-04_summary.png](./bob_sessions/task-04_summary.png)
+
 • Exported History: [bob_sessions/task-04_history.md](./bob_sessions/task-04_history.md)
 
 #### Task 5: watsonx Service
+
 • Description: Integrated IBM watsonx AI SDK and implemented fallback AI services.
+
 • Summary Screenshot: [bob_sessions/task-05_summary.png](./bob_sessions/task-05_summary.png)
+
 • Exported History: [bob_sessions/task-05_history.md](./bob_sessions/task-05_history.md)
 
 #### Task 6: Documentation Refactor
+
 • Description: Cleaned up and professionalized all repository documentation.
+
 • Summary Screenshot: [bob_sessions/task-06_summary.png](./bob_sessions/task-06_summary.png)
+
 • Exported History: [bob_sessions/task-06_history.md](./bob_sessions/task-06_history.md)
 
 #### Task 7: Deployment Configuration
+
 • Description: Optimized Docker settings and environment variable handling.
+
 • Summary Screenshot: [bob_sessions/task-07_summary.png](./bob_sessions/task-07_summary.png)
+
 • Exported History: [bob_sessions/task-07_history.md](./bob_sessions/task-07_history.md)
 
 #### Task 8: Service Validation
+
 • Description: Conducted end-to-end testing of the analysis and generation pipeline.
+
 • Summary Screenshot: [bob_sessions/task-08_summary.png](./bob_sessions/task-08_summary.png)
+
 • Exported History: [bob_sessions/task-08_history.md](./bob_sessions/task-08_history.md)
 
 #### Task 9: Final Submission Report
+
 • Description: Consolidated all project metrics and created the final hackathon report.
+
 • Summary Screenshot: [bob_sessions/task-09_summary.png](./bob_sessions/task-09_summary.png)
+
 • Exported History: [bob_sessions/task-09_history.md](./bob_sessions/task-09_history.md)
 
 ---
@@ -133,10 +160,15 @@ Each Bob task includes:
 ## 6. Features Implemented
 
 • **AI-Powered Analysis**: Deep semantic analysis of GitHub repos using IBM watsonx.ai.
+
 • **Real-Time Progress (SSE)**: Live streaming of analysis status to the user interface.
+
 • **Mermaid.js Visualization**: Automatic generation of architectural diagrams from code structure.
+
 • **Interactive Checklist**: Dynamic onboarding tasks generated based on repository contents.
+
 • **Personal Dashboard**: Persistent history of analyzed projects and onboarding progress.
+
 • **Secure Authentication**: User accounts with encrypted token storage for private repo access.
 
 ---
@@ -144,9 +176,13 @@ Each Bob task includes:
 ## 7. Tech Stack
 
 • **Frontend**: React (Vite), TailwindCSS, Axios, React Markdown, Mermaid.js.
+
 • **Backend**: Python (Flask), SQLAlchemy, Server-Sent Events (SSE).
+
 • **Database**: PostgreSQL (Relational persistence).
+
 • **AI / IBM Tools**: IBM Bob (Lead Dev), IBM watsonx.ai (LLM Engine).
+
 • **DevOps**: Docker, Docker Compose.
 
 ---
@@ -177,12 +213,19 @@ Access the application at `http://localhost`.
 ## 9. Submission Checklist
 
 • [x] Public repo URL is available.
+
 • [ ] Demo video URL is available.
+
 • [x] bob_sessions/ folder exists in the repo root.
+
 • [x] Bob session summary screenshots are included.
+
 • [x] Bob exported task-history Markdown files are included.
+
 • [x] Problem and solution statement is complete.
+
 • [x] IBM Bob usage is clearly explained.
+
 • [x] Final code is pushed to the main branch.
 
 ---
