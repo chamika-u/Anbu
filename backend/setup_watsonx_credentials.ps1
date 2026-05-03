@@ -6,8 +6,8 @@ Write-Host "Setting up WatsonX AI credentials..." -ForegroundColor Green
 $envFile = "backend/.env"
 
 # Your WatsonX credentials
-$apiKey = "s6MP6hc0MdmpO9uaHeHhhyrKT00sJQ-Dl8HOYbIv2ODc"
-$projectId = "c41f5293-add5-43fe-96f0-2fd71939e625"
+$apiKey = ""
+$projectId = ""
 $url = "https://us-south.ml.cloud.ibm.com"
 $modelId = "ibm/granite-13b-chat-v2"
 
