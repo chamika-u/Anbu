@@ -8,10 +8,10 @@
 ## 1. Problem & Solution Statement
 
 ### Problem
-Developer onboarding is a significant bottleneck in engineering teams. New hires often face undocumented or complex codebases, leading to a 2–4 week ramp-up period where they are unproductive. Senior developers are frequently pulled away from their work to explain basic architecture and setup, creating a resource drain across the organization.
+Developer onboarding is a significant bottleneck in engineering teams. Entering a new software project is often a daunting experience where developers are met with tens of thousands of lines of code, complex dependency chains, and nuanced architectural patterns. Traditional onboarding relies on outdated documentation and the limited availability of senior mentors. This creates a "friction gap" where the first few days are spent debugging setup rather than understanding the system, leading to a 2–4 week ramp-up period. Senior developers are frequently pulled away from high-value work, creating a resource drain and fostering "imposter syndrome" in new hires.
 
 ### Solution
-**Anbu** is an AI-native platform that automates the generation of comprehensive onboarding guides for any GitHub repository. By leveraging **IBM watsonx.ai**, it provides a deep semantic understanding of the codebase, generating setup guides, tech stack breakdowns, and interactive checklists that reduce onboarding time from weeks to hours.
+**Anbu** is an AI-native platform that automates the generation of comprehensive onboarding guides for any GitHub repository. By leveraging **IBM watsonx.ai**, it provides a deep semantic understanding of the codebase, transforming the weeks-long onboarding struggle into a streamlined, hours-long experience. Anbu generates automated architecture maps (Mermaid.js), contextual setup guides, and interactive checklists synchronized with a PostgreSQL backend. By automating the cognitive heavy lifting of code analysis, Anbu empowers developers to contribute with confidence on day one, preserves the focus of senior engineers, and builds a more inclusive, high-velocity engineering culture.
 
 ---
 
@@ -66,10 +66,10 @@ Anbu/
 
 ## 4. Video Demonstration
 
-• Public Video URL: [Paste your demo video URL here]
+• Public Video URL: [https://youtu.be/WBbyQhU773w](https://youtu.be/WBbyQhU773w)
 
 Briefly describe what the video shows:
-The video showcases the end-to-end user journey: from entering a repository URL, watching real-time analysis progress, viewing AI-generated Mermaid diagrams and documentation, to tracking onboarding progress on the interactive dashboard.
+The video demonstrates the end-to-end journey of Anbu: from analyzing a GitHub repository using IBM watsonx.ai to generating interactive architecture diagrams, tech stack breakdowns, and progress-tracked onboarding checklists. It highlights real-time analysis streaming and the personalized developer dashboard.
 
 ---
 
@@ -214,7 +214,7 @@ Access the application at `http://localhost`.
 
 • [x] Public repo URL is available.
 
-• [ ] Demo video URL is available.
+• [x] Demo video URL is available.
 
 • [x] bob_sessions/ folder exists in the repo root.
 
